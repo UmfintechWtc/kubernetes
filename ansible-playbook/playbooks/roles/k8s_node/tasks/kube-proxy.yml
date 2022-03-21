@@ -1,0 +1,40 @@
+---
+- name: Create kube-proxy logs
+  file:
+    path: "{{ k8s_node_logs_path }}/kube-proxy"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    state: directory
+    mode: 0755
+
+- name: Template kube-proxy config and scripts
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+  with_items:
+    - { src: kube-proxy.service.j2, dest: /usr/lib/systemd/system/kube-proxy.service }
+    - { src: kube-proxy.conf.j2, dest: "{{ k8s_node_cfg_path }}/kube-proxy.conf" }
+    - { src: kube-proxy.yaml.j2, dest: "{{ k8s_node_cfg_path }}/kube-proxy.yaml" }
+    - { src: create_kube_proxy.kubeconfig.sh.j2, dest: "{{ k8s_node_path }}/create_kube_proxy.kubeconfig.sh"}
+
+- name: execute scripts and daemon-reload
+  shell: |
+    cd "{{ k8s_node_path }}"
+    /bin/bash ./create_kube_proxy.kubeconfig.sh
+    systemctl daemon-reload
+  notify:
+    - Restart kube-proxy service
+
+- meta: flush_handlers
+
+- name: Check kube-proxy ports
+  wait_for:
+    port: 10249
+    state: started
+    host: "{{ ansible_host }}"
+    delay: 5
+    timeout: 60
+    connect_timeout: 10

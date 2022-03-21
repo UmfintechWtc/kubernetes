@@ -1,0 +1,11 @@
+---
+- name: Unarchive cfssl.tar.gz
+  unarchive:
+    src: cfssl.tar.gz
+    dest: "{{ app.home }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+
+- name: Add to system command
+  shell: "cp {{ app.home }}/cfssl/* /usr/local/bin"

@@ -1,0 +1,8 @@
+---
+- name: Unarchive cni.tar.gz
+  unarchive:
+    src: cni.tar.gz
+    dest: "{{ app.home }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755

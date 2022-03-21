@@ -1,0 +1,21 @@
+---
+- name: Create CroeDNS dir
+  file:
+    path: "{{ coredns_home }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    state: directory
+    mode: 0755
+
+- name: Copy CoreDNS.yml
+  copy:
+    src: coredns.yml
+    dest: "{{ coredns_home }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+
+- name: Create coredns pod
+  shell: |
+    cd "{{ coredns_home }}"
+    kubectl apply -f coredns.yml

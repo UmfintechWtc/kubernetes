@@ -1,0 +1,29 @@
+---
+- name: Install supervisor
+  package:
+    name:
+      - python-setuptools
+      - python-meld3
+      - supervisor
+    state: present
+    skip_broken: true
+
+- name: Copy /etc/supervisord.conf
+  copy:
+    src: supervisord.conf
+    dest: /etc/supervisord.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Restart supervisor service
+
+- name: Copy /usr/lib/systemd/system/supervisord.service
+  copy:
+    src: supervisord.service
+    dest: /usr/lib/systemd/system/supervisord.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Restart supervisor service

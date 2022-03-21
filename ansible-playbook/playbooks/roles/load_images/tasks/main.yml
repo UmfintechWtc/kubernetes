@@ -1,0 +1,7 @@
+---
+- import_tasks: prepare.yml
+  tags: CopyImages
+- import_tasks: login.yml
+  tags: DockerLogin
+- import_tasks: load.yml
+  tags: LoadImages

@@ -1,0 +1,41 @@
+---
+- name: Find all repo file
+  find:
+    paths: /etc/yum.repos.d/
+    file_type: file
+    patterns: "*.repo"
+  register: files_to_delete
+
+- name: Clean repo files which not render by us.
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  when:
+    - item.path.split('/')[-1] not in repos
+  with_items: "{{ files_to_delete.files }}"
+
+- name: Modify local.repo address
+  template:
+    src: local.repo.j2
+    dest: /etc/yum.repos.d/local.repo
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Install dependencies
+  yum:
+    name:
+      - gcc*
+      - wget
+      - lrzsz
+      - vim
+      - sysstat
+      - nc
+      - tree
+      - bind-utils
+      - telnet
+      - iotop
+      - pigz
+      - conntrack-tools
+    state: present
+    update_cache: yes

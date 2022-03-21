@@ -1,0 +1,6 @@
+---
+- name: service chronyd restart
+  service:
+    name: chronyd
+    state: restarted
+    enabled: true

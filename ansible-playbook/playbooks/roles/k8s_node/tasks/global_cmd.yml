@@ -1,0 +1,33 @@
+---
+- name: Tempalte k8s node cmd to system
+  template:
+    src: k8s-node.sh.j2
+    dest: /etc/profile.d/k8s-node.sh
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+
+- name: Copy docker.json to kubelet dir
+  shell: |
+    cp $HOME/.docker/config.json /var/lib/kubelet/
+  with_items:
+    - "{{ groups['k8s_node'] }}"
+  ignore_errors: True
+
+- name: source /etc/profile
+  shell: |
+    source /etc/profile.d/k8s-node.sh
+    sleep 30
+
+- name: k8s master approve node
+  shell: |
+    kubectl certificate approve `kubectl get csr | grep Pending | awk '{print $1}'`
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+
+- name: Check k8s cluster status
+  shell: |
+    sleep 30
+    kubectl get nodes
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"

@@ -1,0 +1,38 @@
+# 基本定义
+app:
+  home: /opt/app/kubernetes
+  user: root
+  group: root
+
+# 是否修改主机名
+hostname_change_enable: True
+
+# 是否使用远程repo,defalut: True
+remote_repo:
+  is_active: False
+  url: 10.22.33.70:8000
+
+# docker-repo information
+DockerRegistry: devops.wangtianci.com
+pause_repository: tianciwang/pause-amd64:3.1
+coredns_repository: tianciwang/coredns:v1.6.7
+dashboard_repository: tianciwang/dashboard:v2.1.0
+metrics_repository: tianciwang/metrics-scraper:v1.0.6
+
+# Harbor login information
+harbor_user: admin
+harbor_pass: wtc.com
+
+# k8s token
+k8s_token: 35957c1096125937d959c9edf694dbe1
+
+# k8s flannel network save to etcd path
+k8s_network_path: /coreos.com/network
+
+# k8s api-server port
+apiserver_port: 6443
+controller_manager_port: 10257
+scheduler_port: 10259
+kubelet_port: 10250
+kube_proxy: 10256
+dashboard_port: 33333

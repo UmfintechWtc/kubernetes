@@ -1,0 +1,15 @@
+#!/bin/bash
+cd {{ etcd_bin_path }}
+#ETCDCTL_API=3 ./etcdctl \
+#  --cacert={{ etcd_ssl_path }}/ca.pem \
+#  --cert={{ etcd_ssl_path }}/server.pem \
+#  --key={{ etcd_ssl_path }}/server-key.pem \
+#  --endpoints="{% for host in groups['etcd'] %}https://{{ hostvars[host]['ansible_host'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}" \
+#  endpoint health
+
+ETCDCTL_API=2 ./etcdctl \
+  --endpoints="{% for host in groups['etcd'] %}https://{{ hostvars[host]['ansible_host'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}" \
+  --ca-file={{ etcd_ssl_path }}/ca.pem \
+  --cert-file={{ etcd_ssl_path }}/etcd.pem \
+  --key-file={{ etcd_ssl_path }}/etcd-key.pem \
+  cluster-health

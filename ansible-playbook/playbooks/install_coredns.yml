@@ -1,0 +1,5 @@
+- name: Install coredns
+  hosts: coredns
+  gather_facts: no
+  roles:
+    - coredns

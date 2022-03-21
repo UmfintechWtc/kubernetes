@@ -1,0 +1,44 @@
+---
+- name: Create apiserver dir
+  file:
+    path: "{{ item }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - "{{ k8s_master_logs_path }}/apiserver"
+
+- name: Copy audit-policy.yaml
+  copy:
+    src: audit-policy.yaml
+    dest: "{{ k8s_master_cfg_path }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+
+- name: Template apiserver conf
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+  with_items:
+    - { src: kube-apiserver.conf.j2, dest: "{{ k8s_master_cfg_path }}/kube-apiserver.conf" }
+    - { src: kube-apiserver.service.j2, dest: /usr/lib/systemd/system/kube-apiserver.service }
+
+- name: kube-apiserver daemon-reload
+  shell: systemctl daemon-reload
+  notify:
+    - Restart kube-apiserver service
+
+- meta: flush_handlers
+
+- name: Check kube-apiserver ports
+  wait_for:
+    port: "{{ apiserver_port }}"
+    state: started
+    host: "{{ ansible_host }}"
+    delay: 5
+    timeout: 60
+    connect_timeout: 10

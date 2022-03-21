@@ -1,0 +1,4 @@
+---
+# defaults file for init_host
+repos:
+- "local.repo"

@@ -1,0 +1,49 @@
+---
+- name: Install docker and docker-compose
+  yum:
+    name:
+      - docker-ce
+      - docker-compose
+    state: present
+    update_cache: yes
+
+- name: Create Docker dir
+  file:
+    path: "{{ item }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - "{{ docker_data_path }}"
+    - /etc/docker
+
+- name: Copy docker.service
+  copy:
+    src: docker.service
+    dest: /usr/lib/systemd/system/docker.service
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+
+- name: docker daemon-reload
+  shell: systemctl daemon-reload
+
+- name: Template Docker daemon.json
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+  notify:
+    - Restart docker service
+
+- meta: flush_handlers
+
+- name: Check docker ports
+  wait_for:
+    port: 2375
+    state: started
+    host: "{{ ansible_host }}"
+    delay: 5
+    timeout: 60
+    connect_timeout: 10

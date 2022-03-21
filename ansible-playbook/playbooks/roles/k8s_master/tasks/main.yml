@@ -1,0 +1,15 @@
+---
+- import_tasks: prepare.yml
+  tags: K8sPrepare
+- import_tasks: ssl.yml
+  tags: ssl
+- import_tasks: apiserver.yml
+  tags: apiserver
+- import_tasks: kube-controller-manager.yml
+  tags: kube-controller-manager
+- import_tasks: kube-scheduler.yml
+  tags: kube-scheduler
+- import_tasks: kube-admin.yml
+  tags: kube-admin
+- import_tasks: global_cmd.yml
+  tags: global_cmd

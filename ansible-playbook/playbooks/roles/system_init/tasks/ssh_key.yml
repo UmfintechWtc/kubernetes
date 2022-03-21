@@ -1,0 +1,24 @@
+---
+- name: Add authorized_key
+  authorized_key:
+    user: "{{ app.user }}"
+    key: "{{ lookup('file', 'id_rsa.pub') }}"
+
+- name: Deploy sshkey
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+  with_items:
+    - { src: id_rsa, dest: /root/.ssh/id_rsa, mode: 600 }
+    - { src: id_rsa.pub, dest: /root/.ssh/id_rsa.pub, mode: 644 }
+
+- name: Copy config to .ssh path
+  copy:
+    src: config
+    dest: /root/.ssh/config
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0600

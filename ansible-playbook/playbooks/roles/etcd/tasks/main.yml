@@ -1,0 +1,108 @@
+---
+- name: Create etcd dir
+  file:
+    path: "{{ item }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - "{{ etcd_data_path }}"
+    - "{{ etcd_wal_path }}"
+    - "{{ etcd_ssl_path }}"
+    - "{{ etcd_cfg_path }}"
+    - "{{ etcd_bin_path }}"
+    - "{{ etcd_logs_path }}"
+
+- name: Copy ca file to ssl path
+  copy:
+    src: "{{ item }}"
+    dest: "{{ etcd_ssl_path }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+  with_items:
+    - ca-config.json
+    - ca-csr.json
+    - ca.pem
+    - ca-key.pem
+
+- name: Template server file to ssl path
+  template:
+    src: etcd-csr.json.j2
+    dest: "{{ etcd_ssl_path }}/etcd-csr.json"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+
+- name: Create server certificate file
+  shell: |
+    cd "{{ etcd_ssl_path }}"
+    cfssl gencert -ca ca.pem -ca-key ca-key.pem -config ca-config.json --profile kubernetes ./etcd-csr.json  | cfssljson -bare etcd
+
+- name: check ca and server certificate
+  wait_for:
+    path: "{{ item }}"
+  with_items:
+    - "{{ etcd_ssl_path }}/etcd.pem"
+    - "{{ etcd_ssl_path }}/etcd-key.pem"
+
+- name: Unarchive etcd
+  unarchive:
+    src: etcd-v3.4.16.tar.gz
+    dest: "{{ etcd_bin_path }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+
+- name: Template etcd cfg
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+  with_items:
+    - { src: etcd.conf.j2, dest: "{{ etcd_cfg_path }}/etcd.conf" }
+    - { src: etcd.service.j2, dest: /usr/lib/systemd/system/etcd.service }
+    - { src: check_etcd_cluster.sh.j2, dest: "{{ etcd_home }}/check_etcd_cluster.sh" }
+
+- name: systemctl daemon-reload
+  shell: systemctl daemon-reload
+  notify:
+    - Restart etcd service
+
+- meta: flush_handlers
+
+- name: Check etcd ports
+  wait_for:
+    port: 2380
+    state: started
+    host: "{{ ansible_host }}"
+    delay: 5
+    timeout: 60
+    connect_timeout: 10
+
+- name: Check etcd Cluster
+  shell: |
+    /bin/bash
+    "{{ etcd_home }}/check_etcd_cluster.sh"
+  run_once: true
+  delegate_to: "{{ groups.etcd.0 }}"
+  register: etcd_cluster_status
+
+- name: check etcd cluster information
+  debug:
+    msg: "{{ etcd_cluster_status }}"
+  run_once: true
+  delegate_to: "{{ groups.etcd.0 }}"
+
+- name: set flannel network config
+  shell: |
+    cd "{{ etcd_bin_path }}"
+    ETCDCTL_API=2 ./etcdctl \
+      --ca-file={{ etcd_ssl_path }}/ca.pem \
+      --cert-file={{ etcd_ssl_path }}/etcd.pem \
+      --key-file={{ etcd_ssl_path }}/etcd-key.pem \
+      --endpoints="{% for host in groups['etcd'] %}https://{{ hostvars[host]['ansible_host'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}" \
+      set {{ k8s_network_path }}/config  '{ "Network": "10.244.0.0/16", "Backend": {"Type": "vxlan", "DirectRouting": true }}'
+  run_once: true
+  delegate_to: "{{ groups.etcd.0 }}"

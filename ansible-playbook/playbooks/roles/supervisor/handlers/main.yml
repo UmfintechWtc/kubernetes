@@ -1,0 +1,7 @@
+---
+- name: Restart supervisor service
+  systemd:
+    name: supervisord
+    enabled: true
+    state: restarted
+    daemon_reload: yes

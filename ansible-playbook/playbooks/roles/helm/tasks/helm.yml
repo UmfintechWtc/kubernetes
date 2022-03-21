@@ -1,0 +1,8 @@
+---
+- name: install helm
+  unarchive:
+    src: helm.tar.gz
+    dest: /usr/local/bin
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755

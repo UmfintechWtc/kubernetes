@@ -1,0 +1,26 @@
+{
+    "CN": "system:kube-scheduler",
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "hosts": [
+        "127.0.0.1",
+{% for host in groups['k8s_master'] %}
+{% if not loop.last %}
+        "{{ hostvars[host]['ansible_host'] }}",
+{% else %}
+        "{{ hostvars[host]['ansible_host'] }}"
+{% endif %}
+{% endfor %}
+    ],
+    "names": [
+        {
+            "C": "CN",
+            "ST": "BeiJing",
+            "L": "BeiJing",
+            "O": "k8s",
+            "OU": "System"
+        }
+    ]
+}

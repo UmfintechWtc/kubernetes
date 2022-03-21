@@ -1,0 +1,5 @@
+---
+harbor_path: "{{ app.home }}/harbor"
+harbor_data_path: "{{ harbor_path }}/data"
+harbor_ssl_path: "{{ harbor_path }}/ssl"
+harbor_logs_path: "{{ harbor_path }}/logs"

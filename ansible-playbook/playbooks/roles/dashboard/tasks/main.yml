@@ -1,0 +1,42 @@
+---
+- name: Create dashboard dir
+  file:
+    path: "{{ app.home }}/dashboard"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    state: directory
+    mode: 0755
+
+- name: Tempalte dashboard yml
+  template:
+    src: dashboard.yml.j2
+    dest: "{{ app.home }}/dashboard/dashboard.yml"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+
+- name: kubectl dashboard yml
+  shell: |
+    kubectl apply -f {{ app.home }}/dashboard/dashboard.yml
+
+- name: Create dashboard manager user
+  shell: |
+    kubectl create \
+      serviceaccount dashboard-admin \
+      -n kube-system
+    kubectl create \
+      clusterrolebinding dashboard-admin \
+      --clusterrole=cluster-admin \
+      --serviceaccount=kube-system:dashboard-admin
+  ignore_errors: True
+
+- name: Get dashboard token
+  shell: |
+    kubectl describe secrets \
+      -n kube-system \
+      $(kubectl -n kube-system get secret | awk '/dashboard-admin/{print $1}') | grep "^token" | awk '{print $2}'
+  register: dashboard_token
+
+- name: Dashboard Token information
+  debug:
+    msg: "{{ dashboard_token.stdout_lines[0] }}"

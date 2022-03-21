@@ -1,0 +1,4 @@
+---
+flannel_path: "{{ app.home }}/flannel"
+flannel_bin_path: "{{ flannel_path }}/bin"
+flannel_ssl_path: "{{ flannel_path }}/ssl"

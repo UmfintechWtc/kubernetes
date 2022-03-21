@@ -1,0 +1,22 @@
+[Unit]
+Description=Etcd Server
+After=network.target
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+EnvironmentFile={{ etcd_cfg_path }}/etcd.conf
+ExecStart=/opt/app/kubernetes/etcd/bin/etcd \
+--cert-file={{ etcd_ssl_path }}/etcd.pem \
+--key-file={{ etcd_ssl_path }}/etcd-key.pem \
+--peer-cert-file={{ etcd_ssl_path }}/etcd.pem \
+--peer-key-file={{ etcd_ssl_path }}/etcd-key.pem \
+--trusted-ca-file={{ etcd_ssl_path }}/ca.pem \
+--peer-trusted-ca-file={{ etcd_ssl_path }}/ca.pem \
+--logger=zap
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

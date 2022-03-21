@@ -1,0 +1,37 @@
+---
+- name: Create kubelet logs dir
+  file:
+    path: "{{ k8s_node_logs_path }}/kubelet"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    state: directory
+    mode: 0755
+
+- name: Unarchive k8s-node
+  unarchive:
+    src: k8s_node.tar.gz
+    dest: "{{ k8s_node_bin_path }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+
+- name: Template kubelet config and scripts
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+  with_items:
+    - { src: create_kubelet.sh.j2, dest: "{{ k8s_node_path }}/create_kubelet.sh" }
+    - { src: kubelet.service.j2, dest: /usr/lib/systemd/system/kubelet.service }
+    - { src: kubelet.yaml.j2, dest: "{{ k8s_node_cfg_path }}/kubelet.yaml" }
+    - { src: kubelet.conf.j2, dest: "{{ k8s_node_cfg_path }}/kubelet.conf" }
+
+- name: execute scripts and daemon-reload
+  shell: |
+    cd "{{ k8s_node_path }}"
+    /bin/bash ./create_kubelet.sh
+    systemctl daemon-reload
+  notify:
+    - Restart kubelet service

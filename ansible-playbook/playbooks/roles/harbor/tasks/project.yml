@@ -1,0 +1,23 @@
+---
+- name: Create Base Project
+  uri:
+    url: "https://{{ DockerRegistry }}/api/v2.0/projects"
+    user: "{{ harbor_user }}"
+    password: "{{ harbor_pass }}"
+    force_basic_auth: yes
+    validate_certs: no
+    body_format: json
+    body:
+      { "project_name": "{{ item }}",
+        "metadata": {
+          "public": "true"
+        }
+      }
+    headers:
+      Content-Type: application/json
+    method: POST
+    status_code: [200,201]
+  with_items:
+    - base
+    - module
+    - open

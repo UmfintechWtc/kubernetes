@@ -1,0 +1,31 @@
+---
+- name: Create base dir
+  file:
+    path: "{{ item }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - "{{ k8s_master_path }}"
+    - "{{ k8s_master_bin_path }}"
+    - "{{ k8s_master_cfg_path }}"
+    - "{{ k8s_master_ssl_path }}"
+    - "{{ k8s_master_logs_path }}"
+
+- name: Unarchive k8s_master.tar.gz
+  unarchive:
+    src: k8s_master.tar.gz
+    dest: "{{ k8s_master_bin_path }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+
+- name: Template ca files to ssl path
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+  with_items:
+    - { src: token.csv.j2 , dest: "{{ k8s_master_cfg_path }}/token.csv" }

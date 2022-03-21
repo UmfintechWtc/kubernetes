@@ -1,0 +1,6 @@
+- name: Install etcd
+  hosts: etcd
+  gather_facts: no
+  roles:
+    - cfssl
+    - etcd

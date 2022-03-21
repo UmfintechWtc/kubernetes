@@ -1,0 +1,7 @@
+---
+k8s_master_path: "{{ app.home }}/k8s_master"
+k8s_master_bin_path: "{{ k8s_master_path }}/bin"
+k8s_master_cfg_path: "{{ k8s_master_path }}/cfg"
+k8s_master_ssl_path: "{{ k8s_master_path }}/ssl"
+k8s_master_logs_path: "{{ k8s_master_path }}/logs"
+etcd_ssl_path: "{{ app.home }}/etcd/ssl"

@@ -1,0 +1,123 @@
+---
+- name: Copy ca files to ssl path
+  copy:
+    src: "{{ item }}"
+    dest: "{{ k8s_master_ssl_path }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+  with_items:
+    - ca-config.json
+    - ca-csr.json
+    - ca.pem
+    - ca-key.pem
+    - admin.json
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+
+- name: Template ca files to ssl path
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+  with_items:
+    - { src: apiserver.json.j2, dest: "{{ k8s_master_ssl_path }}/apiserver.json" }
+    - { src: kube-controller-manager.json.j2, dest: "{{ k8s_master_ssl_path }}/kube-controller-manager.json" }
+    - { src: kube-scheduler.json.j2, dest: "{{ k8s_master_ssl_path }}/kube-scheduler.json" }
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+
+- name: Create ca certificate files
+  shell: |
+    cd "{{ k8s_master_ssl_path }}"
+    cfssl gencert \
+      -ca ./ca.pem \
+      -ca-key ./ca-key.pem \
+      -config ./ca-config.json \
+      --profile kubernetes ./apiserver.json | \
+      cfssljson -bare apiserver
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+
+- name: check ca and server certificate
+  wait_for:
+    path: "{{ item }}"
+  with_items:
+    - "{{ k8s_master_ssl_path }}/apiserver.pem"
+    - "{{ k8s_master_ssl_path }}/apiserver-key.pem"
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+
+- name: Create kube-controller-manager certificate
+  shell: |
+    cd "{{ k8s_master_ssl_path }}"
+    cfssl gencert \
+      -ca ./ca.pem \
+      -ca-key ./ca-key.pem \
+      -config ./ca-config.json \
+      --profile kubernetes ./kube-controller-manager.json | \
+      cfssljson -bare kube-controller-manager
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+
+- name: check kube-controller-manager certificate file
+  wait_for:
+    path: "{{ item }}"
+  with_items:
+    - "{{ k8s_master_ssl_path }}/kube-controller-manager-key.pem"
+    - "{{ k8s_master_ssl_path }}/kube-controller-manager.pem"
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+
+- name: Create kube-scheduler certificate
+  shell: |
+    cd "{{ k8s_master_ssl_path }}"
+    cfssl gencert \
+      -ca ./ca.pem \
+      -ca-key ./ca-key.pem \
+      -config ./ca-config.json \
+      --profile kubernetes ./kube-scheduler.json | \
+      cfssljson -bare kube-scheduler
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+
+- name: check kube-scheduler certificate file
+  wait_for:
+    path: "{{ item }}"
+  with_items:
+    - "{{ k8s_master_ssl_path }}/kube-scheduler-key.pem"
+    - "{{ k8s_master_ssl_path }}/kube-scheduler.pem"
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+
+- name: Create kube-admin certificate
+  shell: |
+    cd "{{ k8s_master_ssl_path }}"
+    cfssl gencert \
+      -ca ./ca.pem \
+      -ca-key ./ca-key.pem \
+      -config ./ca-config.json \
+      --profile kubernetes ./admin.json | \
+      cfssljson -bare admin
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+
+- name: check kube-admin certificate file
+  wait_for:
+    path: "{{ item }}"
+  with_items:
+    - "{{ k8s_master_ssl_path }}/admin-key.pem"
+    - "{{ k8s_master_ssl_path }}/admin.pem"
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+
+- name: sync master ssl file
+  shell: |
+    scp -r {{ k8s_master_ssl_path }} {{ app.user }}@{{ host }}:{{ k8s_master_path }}
+  with_items:
+    - "{{ groups['k8s_master'][1:] }}"
+  loop_control:
+    loop_var: host
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+  when: "{{ groups['k8s_master'] | length > 1 }}"

@@ -1,0 +1,11 @@
+---
+- import_tasks: prepare.yml
+  tags: K8sPrepare
+- import_tasks: cni.yml
+  tags: cni
+- import_tasks: kubelet.yml
+  tags: kubelet
+- import_tasks: kube-proxy.yml
+  tags: kube-proxy
+- import_tasks: global_cmd.yml
+  tags: global_cmd

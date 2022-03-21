@@ -1,0 +1,55 @@
+---
+- name: create workspace dir
+  file:
+    path: "{{ item }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    state: directory
+    recurse: yes
+    mode: 0755
+  loop:
+     - /opt/app/kubernetes
+
+- name: System Initialization
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+    owner: root
+    group: root
+  with_items:
+    - { src: 20-nproc.conf, dest: /etc/security/limits.d/20-nproc.conf }
+    - { src: sysctl.conf, dest: /etc/sysctl.conf }
+
+- name: Sysctl configuration tasks effect
+  shell: sysctl -p
+
+# vim /etc/security/limits.conf
+- name: Set system limit
+  pam_limits:
+    domain: "*"
+    limit_type: "{{ item.type }}"
+    limit_item: "{{ item.limit }}"
+    value: "{{ item.value }}"
+  with_items:
+    - { type: "soft", limit: "nproc", value: "655350" }
+    - { type: "hard", limit: "nproc", value: "655350" }
+    - { type: "soft", limit: "nofile", value: "2500000" }
+    - { type: "hard", limit: "nofile", value: "2500000" }
+    - { type: "soft", limit: "memlock", value: "unlimited" }
+    - { type: "hard", limit: "memlock", value: "unlimited" }
+    - { type: "-", limit: "core", value: "unlimited" }
+
+- name: Shutdown unimportant services
+  service:
+    name: "{{ item }}"
+    enabled: false
+    state: stopped
+  with_items:
+    - postfix
+  ignore_errors: true
+
+- name: disbale swap
+  shell: |
+    swapoff -a
+    sed -i 's/.*swap.*/#&/' /etc/fstab

@@ -1,0 +1,4 @@
+---
+file_images_path: "{{ app.home }}/load_images"
+etcd_home: "{{ app.home }}/etcd"
+etcd_ssl_path: "{{ etcd_home }}/ssl"

@@ -1,0 +1,6 @@
+- name: Install k8s node
+  hosts: k8s_node
+  gather_facts: yes
+  roles:
+    - cfssl
+    - k8s_node

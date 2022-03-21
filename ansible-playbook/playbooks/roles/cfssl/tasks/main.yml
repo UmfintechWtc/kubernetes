@@ -1,0 +1,9 @@
+---
+- name: check cfssl env
+  shell: cfssl version | grep "Version" | awk '{print $2}'
+  register: cfssl_env
+  ignore_errors: True
+
+- name: check cfssl version
+  import_tasks: cfssl.yml
+  when: cfssl_env.stdout != "1.2.0"

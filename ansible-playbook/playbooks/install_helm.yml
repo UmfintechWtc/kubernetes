@@ -1,0 +1,5 @@
+- name: Install helm
+  hosts: helm
+  gather_facts: no
+  roles:
+    - helm

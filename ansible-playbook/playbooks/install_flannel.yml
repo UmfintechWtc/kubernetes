@@ -1,0 +1,5 @@
+- name: Install flannel
+  hosts: flannel
+  gather_facts: yes
+  roles:
+    - flannel

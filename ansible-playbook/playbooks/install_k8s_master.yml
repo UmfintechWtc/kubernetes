@@ -1,0 +1,6 @@
+- name: Install k8s master
+  hosts: k8s_master
+  gather_facts: yes
+  roles:
+    - cfssl
+    - k8s_master

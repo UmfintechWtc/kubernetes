@@ -1,0 +1,40 @@
+---
+- name: Tempalte k8s master cmd to system
+  template:
+    src: k8s-master.sh.j2
+    dest: /etc/profile.d/k8s-master.sh
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+
+#- name: Create cluster role
+#  shell: |
+#    source /etc/profile.d/k8s-master.sh
+#    kubectl create clusterrolebinding kubelet-bootstrap \
+#      --clusterrole=system:node-bootstrapper \
+#      --user=kubelet-bootstrap
+#  ignore_errors: True
+
+- name: Copy rbac yml file
+  copy:
+    src: k8s-rbac.yml
+    dest: "{{ k8s_master_path }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+
+- name: Create rbac roles
+  shell: |
+    cd "{{ k8s_master_path }}"
+    kubectl apply -f k8s-rbac.yml
+  ignore_errors: True
+
+- name: sync kube/config cert file
+  shell: |
+    ssh {{ app.user }}@{{ host }} "mkdir /root/.kube"
+    scp -r /root/.kube/config {{ app.user }}@{{ host }}:/root/.kube
+  with_items:
+    - "{{ groups['h8s_node'] }}"
+  loop_control:
+    loop_var: host
+  ignore_errors: True

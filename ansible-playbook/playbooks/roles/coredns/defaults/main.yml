@@ -1,0 +1,2 @@
+---
+coredns_home: "{{ app.home }}/coredns"

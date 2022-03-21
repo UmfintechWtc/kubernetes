@@ -1,0 +1,8 @@
+---
+- name: Install system_init
+  hosts: k8s_hosts
+  gather_facts: no
+  roles:
+    - system_init
+    - chrony
+    - supervisor

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+mkdir $HOME/.kube
+KUBE_CONFIG="$HOME/.kube/config"
+KUBE_APISERVER="https://{{ hostvars[groups['k8s_master'][0]]['ansible_host'] }}:6443"
+
+{{ k8s_master_bin_path }}/kubectl config set-cluster kubernetes \
+  --embed-certs=true \
+  --certificate-authority={{ k8s_master_ssl_path }}/ca.pem \
+  --server=${KUBE_APISERVER} \
+  --kubeconfig=${KUBE_CONFIG}
+
+{{ k8s_master_bin_path }}/kubectl config set-credentials admin \
+  --embed-certs=true \
+  --client-certificate={{ k8s_master_ssl_path }}/admin.pem \
+  --client-key={{ k8s_master_ssl_path }}/admin-key.pem \
+  --kubeconfig=${KUBE_CONFIG}
+
+{{ k8s_master_bin_path }}/kubectl config set-context kubernetes \
+  --cluster=kubernetes \
+  --user=admin \
+  --kubeconfig=${KUBE_CONFIG}
+
+{{ k8s_master_bin_path }}/kubectl config use-context kubernetes --kubeconfig=${KUBE_CONFIG}

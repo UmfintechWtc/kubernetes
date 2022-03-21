@@ -1,0 +1,4 @@
+KUBE_PROXY_OPTS="--logtostderr=false \
+  --config={{ k8s_node_cfg_path }}/kube-proxy.yaml \
+  --log-file={{ k8s_node_logs_path }}/kube-proxy/kube-proxy.log \
+  --v=2"

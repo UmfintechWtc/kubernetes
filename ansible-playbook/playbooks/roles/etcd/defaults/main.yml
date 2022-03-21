@@ -1,0 +1,8 @@
+---
+etcd_home: "{{ app.home }}/etcd"
+etcd_data_path: "{{ etcd_home }}/data"
+etcd_wal_path: "{{ etcd_home }}/wal"
+etcd_ssl_path: "{{ etcd_home }}/ssl"
+etcd_cfg_path: "{{ etcd_home }}/cfg"
+etcd_bin_path: "{{ etcd_home }}/bin"
+etcd_logs_path: "{{ etcd_home }}/logs"

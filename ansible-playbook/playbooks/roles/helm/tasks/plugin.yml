@@ -1,0 +1,30 @@
+---
+- name: check helm plugin path
+  shell: |
+    helm env | grep "HELM_PLUGINS" | awk -v FS="=" '{print $2}'
+  register: helm_plugin_path
+
+- name: set facts
+  set_fact:
+    plugin_path: "{{ helm_plugin_path.stdout_lines.0.split('\"')[1] }}"
+
+- name: Create file
+  file:
+    path: "{{ plugin_path }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    state: directory
+    mode: 0755
+  ignore_errors: True
+
+- name: Check dir exists
+  wait_for:
+    path: "{{ plugin_path }}"
+
+- name: Unarchive helm-push
+  unarchive:
+    src: helm-push.tar.gz
+    dest: "{{ plugin_path }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755

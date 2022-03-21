@@ -1,0 +1,9 @@
+[local_repo]
+name=local repo
+{% if remote_repo.is_active %}
+baseurl=http://{{ remote_repo.url }}/centos7
+{% else %}
+baseurl=http://{{ hostvars[groups['k8s_hosts'][0]]['ansible_host'] }}:8000/centos7
+{% endif %}
+gpgcheck=0
+enable=1

@@ -1,0 +1,43 @@
+---
+- name: Create k8s-node dir
+  file:
+    path: "{{ item }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - "{{ k8s_node_path }}"
+    - "{{ k8s_node_bin_path }}"
+    - "{{ k8s_node_cfg_path }}"
+    - "{{ k8s_node_ssl_path }}"
+    - "{{ k8s_node_logs_path }}"
+
+- name: Copy ca.pem to ssl path
+  copy:
+    src: "{{ item }}"
+    dest: "{{ k8s_node_ssl_path }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+  with_items:
+    - ca.pem
+    - ca-key.pem
+    - ca-config.json
+    - kube-proxy-csr.json
+
+- name: Create kube-proxy certificate
+  shell: |
+    cd "{{ k8s_node_ssl_path }}"
+    cfssl gencert \
+      -ca=ca.pem \
+      -ca-key=ca-key.pem \
+      -config=ca-config.json \
+      -profile=kubernetes kube-proxy-csr.json | \
+      cfssljson -bare kube-proxy
+
+- name: check kube-proxy certificate file
+  wait_for:
+    path: "{{ item }}"
+  with_items:
+    - "{{ k8s_node_ssl_path }}/kube-proxy-key.pem"
+    - "{{ k8s_node_ssl_path }}/kube-proxy.pem"

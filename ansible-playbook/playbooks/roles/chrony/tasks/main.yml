@@ -1,0 +1,34 @@
+---
+- name: change time type to CST
+  shell: timedatectl set-timezone "Asia/Shanghai"
+
+- name: install chrony by yum
+  yum:
+    name: chrony
+    state: present
+    disable_gpg_check: true
+    validate_certs: true
+
+- name: copy /etc/chrony.keys
+  copy:
+    src: chrony.keys
+    dest: /etc/chrony.keys
+    mode: 0640
+
+- name: template chrony_agent config chrony.conf @ centos
+  template:
+    src: chrony_agent.conf
+    dest: /etc/chrony.conf
+  notify:
+    - service chronyd restart
+  when: inventory_hostname not in groups['chrony_server']
+
+- meta: flush_handlers
+
+- name: template chrony_server config chrony.conf @ centos
+  template:
+    src: chrony_server.conf
+    dest: /etc/chrony.conf
+  notify:
+    - service chronyd restart
+  when: inventory_hostname in groups['chrony_server']

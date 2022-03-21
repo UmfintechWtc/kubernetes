@@ -1,0 +1,24 @@
+---
+- name: Create images dir
+  file:
+    path: "{{ file_images_path }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    state: directory
+    mode: 0755
+  run_once: true
+  delegate_to: "{{ groups.docker.0 }}"
+
+- name: Copy pause images
+  copy:
+    src: "{{ item }}"
+    dest: "{{ file_images_path }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+  with_items:
+    - tianciwang_pause.tar.gz
+    - tianciwang_coredns.tar.gz
+    - tianciwang_dashboard.tar.gz
+    - tianciwang_metrics-scraper.tar.gz
+  run_once: true
+  delegate_to: "{{ groups.docker.0 }}"

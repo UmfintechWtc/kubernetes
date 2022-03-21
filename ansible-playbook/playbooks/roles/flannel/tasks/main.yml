@@ -1,0 +1,66 @@
+---
+- name: Create flannel dirs
+  file:
+    path: "{{ item }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - "{{ flannel_path }}"
+    - "{{ flannel_bin_path }}"
+    - "{{ flannel_ssl_path }}"
+
+- name: Copy ca file to ssl path
+  copy:
+    src: "{{ item }}"
+    dest: "{{ flannel_ssl_path }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+  with_items:
+    - ca-config.json
+    - ca-csr.json
+    - ca.pem
+    - ca-key.pem
+    - flannel-csr.json
+
+- name: Create server certificate file
+  shell: |
+    cd "{{ flannel_ssl_path }}"
+    cfssl gencert \
+      -ca ca.pem \
+      -ca-key ca-key.pem \
+      -config ca-config.json \
+      --profile kubernetes ./flannel-csr.json | \
+      cfssljson -bare flannel
+
+- name: check ca and server certificate
+  wait_for:
+    path: "{{ item }}"
+  with_items:
+    - "{{ flannel_ssl_path }}/flannel.pem"
+    - "{{ flannel_ssl_path }}/flannel-key.pem"
+
+- name: Unarchive flannel file
+  unarchive:
+    src: flannel-v0.14.0-linux-amd64.tar.gz
+    dest: "{{ flannel_bin_path }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+
+- name: Template flannel cfg
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+  with_items:
+    - { src: flanneld.service.j2, dest: /usr/lib/systemd/system/flanneld.service }
+
+- name: systemctl daemon-reload
+  shell: |
+    systemctl daemon-reload
+  notify:
+    - Restart flannel service

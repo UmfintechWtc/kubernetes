@@ -1,0 +1,20 @@
+---
+- name: docker login
+  shell: |
+    docker login {{ DockerRegistry }} -u{{ harbor_user }} -p{{ harbor_pass }}
+
+#- name: Check etcd path is exists
+#  stat:
+#    path: "{{ etcd_ssl_path }}"
+#  register: file_status
+
+#- name: sync etcd cert file
+#  shell: |
+#    ssh root@{{ host }} "mkdir {{ etcd_home }}"
+#    scp -r {{ etcd_home }}/ssl root@{{ host }}:{{ etcd_home }}
+#  with_items:
+#    - "{{ groups.hosts }}"
+#  loop_control:
+#    loop_var: host
+#  ignore_errors: True
+#  when: file_status.stat.exists == False

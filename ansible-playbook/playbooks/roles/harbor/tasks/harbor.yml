@@ -1,0 +1,63 @@
+---
+- name: Unarchive harbor.tar.gz
+  unarchive:
+    src: harbor.tar.gz
+    dest: "{{ app.home }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+
+- name: Create Harbor dir
+  file:
+    path: "{{ item }}"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - "{{ harbor_data_path }}"
+    - "{{ harbor_ssl_path }}"
+    - "{{ harbor_logs_path }}"
+
+- name: Create Harbor key file
+  shell: |
+    cd "{{ harbor_ssl_path }}"
+    openssl genrsa -out "{{ DockerRegistry }}".key 4096
+
+- name: Check certificate key file exists
+  wait_for:
+    path: "{{ harbor_ssl_path }}/{{ DockerRegistry }}.key"
+
+- name: Create Harbor certificate crt file
+  shell: |
+    cd "{{ harbor_ssl_path }}"
+    openssl req -x509 -new -nodes -sha512 -days 365000 \
+      -subj "/C=TW/ST=Taipei/L=Taipei/O=example/OU=Personal/CN={{ DockerRegistry }}" \
+      -key {{ DockerRegistry }}.key \
+      -out {{ DockerRegistry }}.crt
+
+- name: Check certificate crt file exists
+  wait_for:
+    path: "{{ harbor_ssl_path }}/{{ DockerRegistry }}.crt"
+
+- name: Template Harbor.yml
+  template:
+    src: harbor.yml.j2
+    dest: "{{ harbor_path }}/harbor.yml"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+
+- name: Install harbor
+  shell: |
+    cd "{{ harbor_path }}"
+    sh ./install.sh --with-chartmuseum
+
+- name: Check harbor ports
+  wait_for:
+    port: 443
+    state: started
+    host: "{{ ansible_host }}"
+    delay: 5
+    timeout: 60
+    connect_timeout: 10

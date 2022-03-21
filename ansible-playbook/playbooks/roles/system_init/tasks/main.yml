@@ -1,0 +1,15 @@
+---
+- import_tasks: ssh_key.yml
+  tags: ssh-key
+- import_tasks: system_optimization.yml
+  tags: init
+- import_tasks: disable_firewall.yml
+  tags: firewall
+- import_tasks: repos.yml
+  tags: repo
+- import_tasks: hostname.yml
+  tags: hostname
+
+
+  
+  

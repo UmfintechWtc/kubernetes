@@ -1,0 +1,49 @@
+---
+- name: docker load pause and coredns images
+  shell: |
+    docker load -i "{{ file_images_path }}/{{ item }}"
+  with_items:
+    - tianciwang_pause.tar.gz
+    - tianciwang_coredns.tar.gz
+    - tianciwang_dashboard.tar.gz
+    - tianciwang_metrics-scraper.tar.gz
+  run_once: true
+  delegate_to: "{{ groups.docker.0 }}"
+
+- name: docker tag for harbor
+  shell: |
+    docker tag "{{ item.name }}" "{{ DockerRegistry }}/{{ item.project }}/{{ item.name.split("/")[1] }}"
+  with_items:
+    - { name: "{{ pause_repository }}", project: base }
+    - { name: "{{ coredns_repository }}", project: base }
+    - { name: "{{ dashboard_repository }}", project: base }
+    - { name: "{{ metrics_repository }}", project: base }
+  run_once: true
+  delegate_to: "{{ groups.docker.0 }}"
+
+- name: images push to harbor
+  shell: |
+    docker push "{{ DockerRegistry }}/{{ item.project }}/{{ item.name.split("/")[1] }}"
+  with_items:
+    - { name: "{{ pause_repository }}", project: base }
+    - { name: "{{ coredns_repository }}", project: base }
+    - { name: "{{ dashboard_repository }}", project: base }
+    - { name: "{{ metrics_repository }}", project: base }
+  run_once: true
+  delegate_to: "{{ groups.docker.0 }}"
+
+- name: Check harbor base project images
+  uri:
+    url: "https://{{ DockerRegistry }}/api/v2.0/projects/{{ item }}/repositories?page_size=10"
+    user: "{{ harbor_user }}"
+    password: "{{ harbor_pass }}"
+    force_basic_auth: yes
+    validate_certs: no
+    headers:
+      Content-Type: application/json
+    method: GET
+    status_code: [200,201]
+  with_items:
+    - base
+  run_once: true
+  delegate_to: "{{ groups.docker.0 }}"

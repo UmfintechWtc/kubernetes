@@ -1,0 +1,17 @@
+---
+- name: Add chmod +x /etc/rc.d/rc.local
+  file:
+    path: /etc/rc.d/rc.local
+    mode: 0755
+
+- name: Modify hostname
+  hostname:
+    name: "{{ HOSTNAME | default(inventory_hostname) }}"
+  when: hostname_change_enable | bool
+
+- name: Generate /etc/hosts
+  blockinfile:
+    content: "{{ lookup('template', 'hosts.j2') }}"
+    path: /etc/hosts
+    marker: "# <!-- {mark} ANSIBLE MANAGED BLOCK -->"
+    state: present
