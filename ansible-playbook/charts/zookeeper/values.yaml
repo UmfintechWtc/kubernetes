@@ -1,0 +1,104 @@
+replicaCount: 1
+
+image:
+  repository: devops.wangtianci.com/open/zookeeper
+  pullPolicy: IfNotPresent
+  tag: "v3.5.7"
+
+podManagementPolicy: Parallel
+updateStrategy: RollingUpdate
+rollingUpdatePartition: ""
+
+startPolicy:
+  enabled: false
+  command:
+    - sleep
+  args:
+    - 3600
+
+minServerId: 1
+
+resources:
+   limits:
+     cpu: "3"
+     memory: 4096Mi
+   requests:
+     cpu: "1"
+     memory: 1024Mi
+
+zk_services:
+  AuthEnable: false
+  ClientPort: 2181
+  FollowerContainerPort: 2888
+  ElectionContainerPort: 3888
+  TickTime: 2000
+  InitLimit: 10
+  SyncLimit: 5
+  PreAllocSize: 65536
+  SnapCount: 100000
+  MaxClientCnxns: 60
+  Autopurge:
+    snapRetainCount: 30
+    purgeInterval: 72
+  MaxSessionTimeout: 40000
+  FourlwCommandsWhitelist: srvr, mntr, ruok
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+  probeCommandTimeout: 2
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+  probeCommandTimeout: 2
+
+dataSavePath:
+  containerDataPath: /opt/app/zookeeper/data
+  containerLogsPath: /opt/app/zookeeper/logs
+  localDataPath: /opt/app/zookeeper/data
+  localLogsPath: /opt/app/zookeeper/logs
+  type: DirectoryOrCreate
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podSecurityContext: {}
+securityContext: {}
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

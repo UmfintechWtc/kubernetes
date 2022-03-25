@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "zookeeper.configname" . }}
+  labels:
+    app: {{ template "zookeeper.configname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  config-zookeeper: |
+    4lw.commands.whitelist={{ .Values.zk_services.FourlwCommandsWhitelist }}
+    tickTime={{ .Values.zk_services.TickTime }}
+    initLimit={{ .Values.zk_services.InitLimit }}
+    syncLimit={{ .Values.zk_services.SyncLimit }}
+    dataDir={{ .Values.dataSavePath.containerDataPath }}
+    dataLogDir={{ .Values.dataSavePath.containerLogsPath }}
+    clientPort={{ .Values.zk_services.ClientPort }}
+    autopurge.snapRetainCount={{ .Values.zk_services.Autopurge.snapRetainCount }}
+    autopurge.purgeInterval={{ .Values.zk_services.Autopurge.purgeInterval }}
+    {{- $replicaCount := int .Values.replicaCount }}
+    {{- $svcName := include "zookeeper.fullname" . }}
+    {{- $zookeeperName := include "zookeeper.fullname" . }}
+    {{- $followerPort := .Values.zk_services.FollowerContainerPort }}
+    {{- $electionPort := .Values.zk_services.ElectionContainerPort }}
+    {{- $minServerId := .Values.minServerId }}
+    {{- $releaseNamespace := include "zookeeper.namespace" . }}
+    {{- range $i, $myidIndex := until $replicaCount }}
+    server.{{ $myidIndex -}}={{ $zookeeperName }}-{{ $myidIndex }}.{{ $svcName }}-headless.default.svc.cluster.local:{{ $followerPort }}:{{ $electionPort -}}
+    {{ end -}}

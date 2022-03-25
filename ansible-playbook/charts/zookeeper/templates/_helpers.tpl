@@ -2,7 +2,21 @@
 Expand the name of the chart.
 */}}
 {{- define "zookeeper.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- default .Chart.Name  | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Expand the namespace of the service
+*/}}
+{{- define "zookeeper.namespace" -}}
+{{- default .Chart.Name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+zookeeper config name
+*/}}
+{{- define "zookeeper.configname" -}}
+{{- default .Chart.Name }}
 {{- end }}
 
 {{/*
@@ -34,19 +48,16 @@ Create chart name and version as used by the chart label.
 Common labels
 */}}
 {{- define "zookeeper.labels" -}}
-helm.sh/chart: {{ include "zookeeper.chart" . }}
 {{ include "zookeeper.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/apiversion: {{ .Chart.AppVersion | quote }}
+app.kubernetes.io/managed-by: Helm
 {{- end }}
 
 {{/*
 Selector labels
 */}}
 {{- define "zookeeper.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "zookeeper.name" . }}
+app.kubernetes.io/name: {{ .Chart.Name }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 

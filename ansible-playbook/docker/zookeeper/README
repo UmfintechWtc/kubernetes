@@ -1,0 +1,42 @@
+[root@node1 zookeeper]# docker build -f dockerfile -t zk:v1 .
+Sending build context to Docker daemon  9.275MB
+Step 1/7 : FROM devops.wangtianci.com/module/jdk-base:1.8.0_271
+ ---> 81cc3cc4249e
+Step 2/7 : MAINTAINER "wangtianci"
+ ---> Running in f385e6ba3508
+Removing intermediate container f385e6ba3508
+ ---> f1fef75789f1
+Step 3/7 : ADD zookeeper.tar.gz /opt/app
+ ---> db316c8c5871
+Step 4/7 : ENV PATH /opt/app/zookeeper/bin:$PATH
+ ---> Running in 1de3cc3dfe02
+Removing intermediate container 1de3cc3dfe02
+ ---> 1619a52c47f9
+Step 5/7 : WORKDIR /opt/app/zookeeper
+ ---> Running in 7f29f3ecd925
+Removing intermediate container 7f29f3ecd925
+ ---> 213e5873c68a
+Step 6/7 : COPY zk_entrypoint.sh /usr/local/bin/
+ ---> ce279b8122a1
+Step 7/7 : RUN chmod 0755 /usr/local/bin/zk_entrypoint.sh
+ ---> Running in bfb4d0dd93a5
+Removing intermediate container bfb4d0dd93a5
+ ---> 2a4ae03aa637
+Successfully built 2a4ae03aa637
+Successfully tagged zk:v1
+
+[root@node1 zookeeper]# docker tag zk:v1 devops.wangtianci.com/open/zookeeper:v3.5.7
+[root@node1 zookeeper]# docker push devops.wangtianci.com/open/zookeeper:v3.5.7
+The push refers to repository [devops.wangtianci.com/open/zookeeper]
+978e0670d560: Pushed
+317675f2ba32: Pushed
+2c67886e3433: Pushed
+8e7d8c30cbc5: Layer already exists
+f2c24faaaa59: Layer already exists
+38baf927e3e0: Layer already exists
+fe08a7acafa4: Layer already exists
+927ee3fe2829: Layer already exists
+821cd6ecbdea: Layer already exists
+c26bc51893eb: Layer already exists
+174f56854903: Layer already exists
+v3.5.7: digest: sha256:81897bb2050d0bec82efde87ac77f1604154888f8826ea3026819e62700fecd6 size: 2619

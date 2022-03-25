@@ -1,0 +1,65 @@
+[root@node1 java_base]# docker build -f dockerfile -t java:1.8.0_217 .
+Sending build context to Docker daemon  143.2MB
+Step 1/15 : FROM centos:centos7.9.2009
+centos7.9.2009: Pulling from library/centos
+Digest: sha256:9d4bcbbb213dfd745b58be38b13b996ebb5ac315fe75711bd618426a630e0987
+Status: Downloaded newer image for centos:centos7.9.2009
+ ---> eeb6ee3f44bd
+Step 2/15 : MAINTAINER "wangtianci"
+ ---> Using cache
+ ---> 961e6b2157d1
+Step 3/15 : COPY ali-centos.repo /etc/yum.repos.d/
+ ---> Using cache
+ ---> e42bd9f7b7c7
+Step 4/15 : COPY ali-epel.repo /etc/yum.repos.d/
+ ---> Using cache
+ ---> 3a8611780573
+Step 5/15 : RUN yum install -y wget vim net-tools unzip sysstat bind-utils curl kde-l10n-Chinese telnet
+ ---> Using cache
+ ---> 548f4cdbbd42
+Step 6/15 : RUN rm -f /etc/localtime     && ln -sv /usr/share/zoneinfo/Asia/Shanghai /etc/localtime     && echo "Asia/Shanghai" > /etc/timezone
+ ---> Using cache
+ ---> 530a360890ce
+Step 7/15 : ENV LC_ALL=zh_CN.utf8
+ ---> Using cache
+ ---> 19e8aa71145c
+Step 8/15 : ENV LANG=zh_CN.utf8
+ ---> Using cache
+ ---> ecc3901df9b4
+Step 9/15 : ENV LANGUAGE=zh_CN.utf8
+ ---> Using cache
+ ---> 4def91cb736b
+Step 10/15 : RUN localedef -c -f UTF-8 -i zh_CN zh_CN.utf8
+ ---> Using cache
+ ---> d462038befee
+Step 11/15 : ADD jdk-8u271-linux-x64.tar.gz /usr/local
+ ---> Using cache
+ ---> c292068bd064
+Step 12/15 : ENV JAVA_HOME /usr/local/jdk1.8.0_271/
+ ---> Using cache
+ ---> 98aae5917cc3
+Step 13/15 : ENV PATH $JAVA_HOME/bin:$PATH
+ ---> Using cache
+ ---> 6fe65d22b18a
+Step 14/15 : RUN mkdir /opt/app
+ ---> Using cache
+ ---> b4de326dcc3e
+Step 15/15 : RUN alias ll="ls -l"
+ ---> Running in 2d63a56a8f26
+Removing intermediate container 2d63a56a8f26
+ ---> 81cc3cc4249e
+Successfully built 81cc3cc4249e
+Successfully tagged java:1.8.0_217
+
+[root@node1 java_base]# docker tag java:1.8.0_217 devops.wangtianci.com/module/jdk-base:1.8.0_271
+[root@node1 java_base]# docker push devops.wangtianci.com/module/jdk-base:1.8.0_271
+The push refers to repository [devops.wangtianci.com/module/jdk-base]
+8e7d8c30cbc5: Layer already exists
+f2c24faaaa59: Layer already exists
+38baf927e3e0: Layer already exists
+fe08a7acafa4: Layer already exists
+927ee3fe2829: Layer already exists
+821cd6ecbdea: Layer already exists
+c26bc51893eb: Layer already exists
+174f56854903: Layer already exists
+1.8.0_271: digest: sha256:cc63f42277a03df67b3a6a7a0ca77c3833a13b94eb7d539ca5b24c31d5cf6059 size: 1994

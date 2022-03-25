@@ -1,0 +1,18 @@
+# jdk基础镜像
+FROM devops.wangtianci.com/module/jdk-base:1.8.0_271
+
+MAINTAINER "wangtianci"
+
+ADD zookeeper.tar.gz /opt/app
+
+ENV PATH /opt/app/zookeeper/bin:$PATH
+
+WORKDIR /opt/app/zookeeper
+
+COPY zk_entrypoint.sh /usr/local/bin/
+
+RUN chmod 0755 /usr/local/bin/zk_entrypoint.sh
+
+# 测试镜像使用，在生产环境中需注释
+# ENTRYPOINT ["/usr/local/bin/zk_entrypoint.sh"]
+# CMD ["sleep","3600"]
