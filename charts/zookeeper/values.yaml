@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: devops.wangtianci.com/open/zookeeper
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   tag: "v3.5.7"
 
 podManagementPolicy: Parallel
