@@ -1,0 +1,20 @@
+[root@node1 ~]# kubectl exec -it test-zookeeper-0 -n test-zookeeper -- zkServer.sh status
+ZooKeeper JMX enabled by default
+Using config: /opt/app/zookeeper/bin/../conf/zoo.cfg
+Client port found: 2181. Client address: localhost.
+Mode: follower
+[root@node1 ~]# kubectl exec -it test-zookeeper-1 -n test-zookeeper -- zkServer.sh status
+ZooKeeper JMX enabled by default
+Using config: /opt/app/zookeeper/bin/../conf/zoo.cfg
+Client port found: 2181. Client address: localhost.
+Mode: follower
+[root@node1 ~]# kubectl exec -it test-zookeeper-2 -n test-zookeeper -- zkServer.sh status
+ZooKeeper JMX enabled by default
+Using config: /opt/app/zookeeper/bin/../conf/zoo.cfg
+Client port found: 2181. Client address: localhost.
+Mode: leader
+[root@node1 ~]# kubectl get pods -n test-zookeeper
+NAME               READY   STATUS    RESTARTS   AGE
+test-zookeeper-0   1/1     Running   1          84s
+test-zookeeper-1   1/1     Running   0          84s
+test-zookeeper-2   1/1     Running   0          84s

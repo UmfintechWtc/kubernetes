@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "zookeeper.configname" . }}
+  namespace: {{ template "zookeeper.namespace" . }}
   labels:
     app: {{ template "zookeeper.configname" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
@@ -26,5 +27,5 @@ data:
     {{- $minServerId := .Values.minServerId }}
     {{- $releaseNamespace := include "zookeeper.namespace" . }}
     {{- range $i, $myidIndex := until $replicaCount }}
-    server.{{ $myidIndex -}}={{ $zookeeperName }}-{{ $myidIndex }}.{{ $svcName }}-headless.default.svc.cluster.local:{{ $followerPort }}:{{ $electionPort -}}
+    server.{{ add $minServerId $myidIndex }}={{ $zookeeperName }}-{{ $myidIndex }}.{{ $svcName }}-headless.{{ $releaseNamespace }}.svc.cluster.local:{{ $followerPort }}:{{ $electionPort -}}
     {{ end -}}

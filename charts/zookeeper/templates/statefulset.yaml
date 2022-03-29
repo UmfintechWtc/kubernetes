@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ template "zookeeper.fullname" . }}
+  namespace: {{ template "zookeeper.namespace" . }}
   labels: {{- include "zookeeper.labels" . | nindent 4 }}
 spec:
   serviceName: {{ include "zookeeper.fullname" . }}-headless
@@ -35,17 +36,12 @@ spec:
             - bash
             - -ec
             - |
-                if [[ -f "/opt/app/zookeeper/data/myid" ]];then
-                  export ZOO_SERVER_ID="$(cat /opt/app/zookeeper/data/myid)"
+                HOSTNAME=`hostname`
+                if [[ "$HOSTNAME" =~ (.*)-([0-9]+)$ ]];then
+                  only_id=${BASH_REMATCH[2]}
+                  echo  "$(( $only_id + 1 ))" &> /opt/app/zookeeper/data/myid
                 else
-                  HOSTNAME=`hostname`
-                  if [[ "$HOSTNAME" =~ (.*)-([0-9]+)$ ]];then
-                    only_id=${BASH_REMATCH[2]}
-                    export ZOO_SERVER_ID=$((only_id + {{ .Values.minServerId }} ))
-                  else
-                    echo "Failed to get server ID from hostname $HOSTNAME"
-                    exit1
-                  fi
+                  echo "Failed to get server ID from hostname $HOSTNAME"
                 fi
                 exec /usr/local/bin/zk_entrypoint.sh
           {{- end }}

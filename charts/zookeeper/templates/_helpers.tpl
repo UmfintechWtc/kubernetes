@@ -6,17 +6,17 @@ Expand the name of the chart.
 {{- end }}
 
 {{/*
-Expand the namespace of the service
+Create zookeeper namespace
 */}}
 {{- define "zookeeper.namespace" -}}
-{{- default .Chart.Name | trunc 63 | trimSuffix "-" }}
+{{- default (include "zookeeper.fullname" .) }}
 {{- end }}
 
 {{/*
-zookeeper config name
+Create zookeeper configmap
 */}}
 {{- define "zookeeper.configname" -}}
-{{- default .Chart.Name }}
+{{- default (include "zookeeper.fullname" .) }}
 {{- end }}
 
 {{/*
