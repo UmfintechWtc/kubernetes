@@ -1,0 +1,145 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "kafka.fullname" . }}
+  namespace: {{ template "kafka.namespace" . }}
+  labels: {{- include "kafka.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "kafka.fullname" . }}-headless
+  replicas: {{ .Values.global.kafka.replicaCount }}
+  podManagementPolicy: {{ .Values.podManagementPolicy }}
+  updateStrategy:
+    type: {{ .Values.updateStrategy }}
+    {{- if (eq "Recreate" .Values.updateStrategy) }}
+    rollingUpdate: null
+    {{- else if .Values.rollingUpdatePartition }}
+    rollingUpdate:
+      partition: {{ .Values.rollingUpdatePartition }}
+    {{- end }}
+  selector:
+    matchLabels: {{- include "kafka.labels" . | nindent 6 }}
+  template:
+    metadata:
+      name: {{ template "kafka.fullname" . }}
+      labels: {{- include "kafka.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ template "kafka.serviceAccountName" . }}
+      containers:
+        - name: {{ template "kafka.fullname" . }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          {{- if .Values.startPolicy.enabled }}
+          command: {{- toYaml .Values.startPolicy.command | nindent 12 }}
+          args: {{- toYaml .Values.startPolicy.args | nindent 12 }}
+          {{- else }}
+          command:
+            - bash
+            - -ec
+            - |
+                HOSTNAME=`hostname`
+                if [[ "$HOSTNAME" =~ (.*)-([0-9]+)$ ]];then
+                  only_id=${BASH_REMATCH[2]}
+                  export KAFKA_BROKER_ID="$(( only_id + {{ .Values.global.minServerId }} ))"
+                else
+                  echo "Failed to get server ID from hostname $HOSTNAME"
+                fi
+                /usr/local/bin/entrypoint.sh && /usr/local/bin/run.sh
+          {{- end }}
+          {{- if .Values.resources }}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}
+          env:
+            - name: KAFKA_CLIENT_PORT
+              value: {{ .Values.kafka_services.ClientPort | quote }}
+            - name: KAFKA_LOG_DIRS
+              value: {{ .Values.dataSavePath.containerDataPath | quote }}
+            - name: KAFKA_NUM_NETWORK_THREADS
+              value: {{ add 2 .Values.resources.limits.cpu | quote }}
+            - name: KAFKA_NUM_IO_NETWORKS
+              value: {{ add 2 .Values.resources.limits.cpu | quote }}
+            - name: KAFKA_SOCKET_SEND_BUFFER_BYTES
+              value: {{ .Values.kafka_services.SocketSendBufferBytes | quote  }}
+            - name: KAFKA_RECEIVER_BUFFER_BYTES
+              value: {{ .Values.kafka_services.SocketReceivebufferBytes | quote }}
+            - name: KAFKA_REQUEST_MAX_BYTES
+              value: {{ .Values.kafka_services.SocketRequestMaxBytes | replace "_" "" | quote }}
+            - name: KAFKA_LOG_FLUSH_INTERVAL_MESSAGE
+              value: {{ .Values.kafka_services.LogFlushIntervalMessages | quote }}
+            - name: KAFKA_LOG_FLUSH_INTERVAL_MS
+              value: {{ .Values.kafka_services.LogFlushIntervalMs | quote }}
+            - name: KAFKA_RECOVERY_THREADS_PER_DATA_DIR
+              value: {{ .Values.kafka_services.ClearDataDirThreads | quote }}
+            - name: KAFKA_LOG_RETENTION_HOURS
+              value: {{ .Values.kafka_services.LogRetentionHours |quote }}
+            - name: KAFKA_ROLL_HOURS
+              value: {{ .Values.kafka_services.LogRollHours | quote }}
+            - name: KAFKA_LOG_SEGMENT_BYTES
+              value: {{ .Values.kafka_services.LogSegMentBytes | replace "_" "" | quote }}
+            - name: KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS
+              value: {{ .Values.kafka_services.LogRetentionCheckTimeMs | quote }}
+            - name: KAFKA_CLEANER_ENABLE
+              value: {{ .Values.kafka_services.LogCleanerEnable | quote }}
+            - name: KAFKA_DELETE_TOPIC_ENABLE
+              value: {{ .Values.kafka_services.DeleteTopicEnable | quote }}
+            - name: KFAFKA_TRANSACTION_MAX_TIMEOUT_MS
+              value: {{ .Values.kafka_services.TransactionMaxTimeoutMs | quote }}
+            - name: KAFKA_OFFSET_TOPIC_REP_FACTOR
+              value: {{ .Values.kafka_services.OffsetTopicRepFactor | quote }}
+            - name: KAFKA_OFFSET_TOPIC_NUM_PARTITIONS
+              value: {{ .Values.kafka_services.OffsetTopicNumPartitions | quote }}
+            - name: KAFKA_TRANSACTION_STATE_LOG_REPL_FACTOR
+              value: {{ .Values.kafka_services.TransactionLogRepFactor | quote }}
+            - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+              value: {{ .Values.kafka_services.transactionLogRepMinIsr | quote }}
+            - name: KAFKA_CONNECT_ZOOKEEPER_TIMEOUT
+              value: {{ .Values.kafka_services.ZkConnectionTimeoutMs | quote }}
+            - name: KAFKA_SESSION_ZOOKEEPER_TIMEOUT
+              value: {{ .Values.kafka_services.ZkSessionTimeoutMs | quote }}
+            - name: KAFKA_CONNECT_ZOOKEEPER_ACL
+              value: {{ .Values.kafka_services.ZkAclSet | quote }}
+            {{- $replicaCount := .Values.global.zookeeper.replicaCount | int }}
+            {{- $ReleaseName := .Release.Name }}
+            - name: KAFKA_CONNECT_ZOOKEEPER_ADDRESS
+              value: {{ range $zk_name_id := until $replicaCount }}{{ $ReleaseName }}-zookeeper-{{ $zk_name_id }}.{{ $ReleaseName }}-zookeeper-headless.{{ $ReleaseName }}-zookeeper.svc.cluster.local:2181,{{ end }}
+          livenessProbe:
+            tcpSocket:
+              port: kafka-client
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          readinessProbe:
+            tcpSocket:
+              port: kafka-client
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          ports:
+            - name: kafka-client
+              containerPort: {{ .Values.kafka_services.ClientPort }}
+            - name: kafka-interval
+              containerPort: {{ .Values.kafka_services.InternalPort }}
+          volumeMounts:
+            - name: datadir
+              mountPath: {{ .Values.dataSavePath.containerDataPath }}
+            - name: logsdir
+              mountPath: {{ .Values.dataSavePath.containerLogsPath }}
+#            - name: kafka-config
+#              mountPath: /opt/app/kafka/config/server.properties
+#              subPath: config-kafka
+      dnsPolicy: ClusterFirst
+      volumes:
+        - name: datadir
+          hostPath:
+            path: {{ .Values.dataSavePath.localDataPath }}
+            type: {{ .Values.dataSavePath.type }}
+        - name: logsdir
+          hostPath:
+            path: {{ .Values.dataSavePath.localLogsPath }}
+            type: {{ .Values.dataSavePath.type }}
+#        - name: kafka-config
+#          configMap:
+#            name: {{ template "kafka.configname" . }}
