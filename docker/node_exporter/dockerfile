@@ -1,0 +1,14 @@
+# jdk基础镜像
+FROM devops.wangtianci.com/module/jdk-base:1.8.0_271
+
+MAINTAINER "wangtianci"
+
+ADD node_exporter.tar.gz /opt/app
+
+ENV PATH /opt/app/node_exporter/bin:$PATH
+
+WORKDIR /opt/app/node_exporter
+
+# 测试镜像使用，在生产环境中需注释
+ENTRYPOINT ["./node_exporter"]
+# CMD ["sleep","3600"]
