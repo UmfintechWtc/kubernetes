@@ -1,0 +1,21 @@
+# jdk基础镜像
+FROM devops.wangtianci.com/module/jdk-base:1.8.0_271
+
+MAINTAINER "wangtianci"
+
+ADD kafka.tar.gz /opt/app
+
+ENV PATH /opt/app/kafka/bin:$PATH
+ENV KAFKA_CONF_DIR /opt/app/kafka/config/
+
+WORKDIR /opt/app/kafka
+
+COPY run.sh /usr/local/bin/
+COPY entrypoint.sh /usr/local/bin
+
+RUN chmod 0755 /usr/local/bin/entrypoint.sh \
+    && chmod 0755 /usr/local/bin/run.sh
+
+# 测试镜像使用，在生产环境中需注释
+# ENTRYPOINT ["/usr/local/bin/zk_entrypoint.sh"]
+# CMD ["sleep","3600"]
