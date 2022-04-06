@@ -7,6 +7,7 @@ metadata:
     {{- include "zookeeper.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
+  clusterIP: None
   ports:
     - name: tcp-client
       port: {{ .Values.zk_services.ClientPort }}

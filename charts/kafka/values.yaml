@@ -1,0 +1,125 @@
+global:
+  zookeeper:
+    replicaCount: 3
+  kafka:
+    replicaCount: 1
+  minServerId: 1
+
+image:
+  repository: devops.wangtianci.com/open/kafka
+  pullPolicy: Always
+  tag: "v2.12"
+
+podManagementPolicy: Parallel
+updateStrategy: RollingUpdate
+rollingUpdatePartition: ""
+
+startPolicy:
+  enabled: false
+  command:
+    - sleep
+  args:
+    - infinity
+
+resources:
+   limits:
+     cpu: "3"
+     memory: 8092Mi
+   requests:
+     cpu: "1"
+     memory: 1024Mi
+
+kafka_services:
+  AuthEnable: false
+  ConfigMap: false
+  # port
+  ClientPort: 9092
+  InternalPort: 9093
+  JmxPort: 9999
+  # Buffer
+  SocketSendBufferBytes: 102400
+  SocketReceivebufferBytes: 102400
+  SocketRequestMaxBytes: _104857600
+  LogFlushIntervalMessages: 100000
+  LogFlushIntervalMs: 3000
+  # Log
+  ClearDataDirThreads: 1
+  LogRetentionHours: 168
+  LogRollHours: 168
+  LogSegMentBytes: _1073741824
+  LogRetentionCheckTimeMs: 300000
+  LogCleanerEnable: true
+  # Zk
+  ZkConnectionTimeoutMs: 3000
+  ZkSessionTimeoutMs: 3000
+  ZkAclSet: false
+  # Topic
+  DeleteTopicEnable: true
+  TransactionMaxTimeoutMs: 180000
+  OffsetTopicRepFactor: 2
+  OffsetTopicNumPartitions: 2
+  TransactionLogRepFactor: 2
+  transactionLogRepMinIsr: 2
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 60
+  periodSeconds: 15
+  timeoutSeconds: 10
+  failureThreshold: 6
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 90
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+dataSavePath:
+  containerDataPath: /opt/app/kafka/data
+  containerLogsPath: /opt/app/kafka/logs
+  localDataPath: /opt/app/kafka/data
+  localLogsPath: /opt/app/kafka/logs
+  type: DirectoryOrCreate
+
+externalAccess:
+  enabled: true
+  type: ExternalName
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podSecurityContext: {}
+securityContext: {}
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+

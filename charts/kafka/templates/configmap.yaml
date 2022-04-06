@@ -1,0 +1,41 @@
+{{- if .Values.ConfigMap }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "kafka.configname" . }}
+  namespace: {{ template "kafka.namespace" . }}
+  labels:
+    app: {{ template "kafka.configname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  config-kafka: |
+    port={{ .Values.kafka_services.ClientPort }}
+    log.dirs={{ .Values.dataSavePath.containerDataPath }}
+    num.network.threads={{ add 2 .Values.resources.limits.cpu }}
+    num.io.threads={{ add 2 .Values.resources.limits.cpu }}
+    socket.send.buffer.bytes={{ .Values.kafka_services.SocketSendBufferBytes }}
+    socket.receive.buffer.bytes={{ .Values.kafka_services.SocketReceivebufferBytes }}
+    socket.request.max.bytes={{ .Values.kafka_services.SocketRequestMaxBytes | int }}
+    log.flush.interval.messages={{ .Values.kafka_services.LogFlushIntervalMessages }}
+    log.flush.interval.ms={{ .Values.kafka_services.LogFlushIntervalMs }}
+    num.recovery.threads.per.data.dir={{ .Values.kafka_services.ClearDataDirThreads }}
+    log.retention.hours={{ .Values.kafka_services.LogRetentionHours }}
+    log.roll.hours={{ .Values.kafka_services.LogRollHours }}
+    log.segment.bytes={{ .Values.kafka_services.LogSegMentBytes | int }}
+    log.retention.check.interval.ms={{ .Values.kafka_services.LogRetentionCheckTimeMs }}
+    log.cleaner.enable={{ .Values.kafka_services.LogCleanerEnable }}
+    delete.topic.enable={{ .Values.kafka_services.DeleteTopicEnable }}
+    transaction.max.timeout.ms={{ .Values.kafka_services.TransactionMaxTimeoutMs }}
+    offsets.topic.replication.factor={{ .Values.kafka_services.OffsetTopicRepFactor }}
+    offsets.topic.num.partitions={{ .Values.kafka_services.OffsetTopicNumPartitions }}
+    transaction.state.log.replication.factor={{ .Values.kafka_services.TransactionLogRepFactor }}
+    transaction.state.log.min.isr={{ .Values.kafka_services.transactionLogRepMinIsr }}
+    {{- $replicaCount := .Values.global.zookeeper.replicaCount | int }}
+    {{- $ReleaseName := .Release.Name }}
+    zookeeper.connect={{ range $zk_name_id := until $replicaCount }}{{ $ReleaseName }}-zookeeper-{{ $zk_name_id }}.{{ $ReleaseName }}-zookeeper-headless.{{ $ReleaseName }}-zookeeper.svc.cluster.local:2181,{{ end }}
+    zookeeper.connection.timeout.ms={{ .Values.kafka_services.ZkConnectionTimeoutMs }}
+    zookeeper.session.timeout.ms={{ .Values.kafka_services.ZkSessionTimeoutMs }}
+    zookeeper.set.acl={{ .Values.kafka_services.ZkAclSet }}
+{{- end -}}

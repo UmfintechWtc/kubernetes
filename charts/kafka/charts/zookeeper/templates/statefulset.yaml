@@ -6,7 +6,7 @@ metadata:
   labels: {{- include "zookeeper.labels" . | nindent 4 }}
 spec:
   serviceName: {{ include "zookeeper.fullname" . }}-headless
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.global.zookeeper.replicaCount }}
   podManagementPolicy: {{ .Values.podManagementPolicy }}
   updateStrategy:
     type: {{ .Values.updateStrategy }}

@@ -19,13 +19,13 @@ data:
     clientPort={{ .Values.zk_services.ClientPort }}
     autopurge.snapRetainCount={{ .Values.zk_services.Autopurge.snapRetainCount }}
     autopurge.purgeInterval={{ .Values.zk_services.Autopurge.purgeInterval }}
-    {{- $replicaCount := int .Values.replicaCount }}
+    {{- $replicaCount := int .Values.global.zookeeper.replicaCount | int }}
     {{- $svcName := include "zookeeper.fullname" . }}
     {{- $zookeeperName := include "zookeeper.fullname" . }}
     {{- $followerPort := .Values.zk_services.FollowerContainerPort }}
     {{- $electionPort := .Values.zk_services.ElectionContainerPort }}
-    {{- $minServerId := .Values.minServerId }}
+    {{- $minServerId := .Values.global.minServerId }}
     {{- $releaseNamespace := include "zookeeper.namespace" . }}
-    {{- range $i, $myidIndex := until $replicaCount }}
+    {{- range $myidIndex := until $replicaCount }}
     server.{{ add $minServerId $myidIndex }}={{ $zookeeperName }}-{{ $myidIndex }}.{{ $svcName }}-headless.{{ $releaseNamespace }}.svc.cluster.local:{{ $followerPort }}:{{ $electionPort -}}
     {{ end -}}

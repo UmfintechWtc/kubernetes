@@ -1,5 +1,3 @@
-replicaCount: 3
-
 image:
   repository: devops.wangtianci.com/open/zookeeper
   pullPolicy: Always
@@ -14,9 +12,7 @@ startPolicy:
   command:
     - sleep
   args:
-    - 3600
-
-minServerId: 1
+    - infinity
 
 resources:
    limits:
