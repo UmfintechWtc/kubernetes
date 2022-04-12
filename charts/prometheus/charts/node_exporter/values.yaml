@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: devops.wangtianci.com/open/node_exporter
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   tag: "v0.0.1"
 
 resources:
@@ -21,6 +21,8 @@ node_exporter:
     path.rootfs: /host/root
     collector.filesystem.ignored-mount-points: "^/(dev|proc|sys|var/lib/docker/.+)($|/)"
   hostNetwork: true
+  hostPID: true
+  hostIPC: true
 
 livenessProbe:
   initialDelaySeconds: 120

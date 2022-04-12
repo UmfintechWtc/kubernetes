@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "prometheus.fullname" . }}
+  namespace: {{ .Release.Name }}-{{ .Values.global.namespace.prefix }}
+  labels:
+    {{- include "prometheus.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "prometheus.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "prometheus.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "prometheus.serviceAccountName" . }}
+      containers:
+        - name: {{ include "prometheus.fullname" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.startPolicy.enabled }}
+          command: {{- toYaml .Values.startPolicy.command | nindent 12 }}
+          args: {{- toYaml .Values.startPolicy.args | nindent 12 }}
+          {{- else }}
+          args:
+            - --web.listen-address=0.0.0.0:{{ .Values.prometheus.ClientPort }}
+            {{- range $key, $value := .Values.prometheus.extraArgs }}
+            {{- if $value }}
+            - --{{ $key }}={{ $value }}
+            {{- else }}
+            - --{{ $key }}
+            {{- end }}
+            {{- end }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          ports:
+            - name: prometheus
+              containerPort: {{ .Values.prometheus.ClientPort }}
+              protocol: TCP
+          volumeMounts:
+            - name: prometheus-datadir
+              mountPath: {{ .Values.dataSavePath.containerDataPath }}
+            - name: prometheus-config
+              mountPath: /etc/prometheus.yml
+              subPath: prometheus-config
+      dnsPolicy: ClusterFirst
+      volumes:
+        - name: prometheus-datadir
+          hostPath:
+            path: {{ .Values.dataSavePath.localDataPath }}
+            type: {{ .Values.dataSavePath.type }}
+        - name: prometheus-config
+          configMap:
+            name: {{ template "prometheus.configname" . }}

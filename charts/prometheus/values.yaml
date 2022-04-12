@@ -1,0 +1,101 @@
+global:
+  namespace:
+    enable: true
+    prefix: monitor-ns
+
+replicaCount: 1
+
+image:
+  repository: devops.wangtianci.com/open/prometheus
+  pullPolicy: IfNotPresent
+  tag: "v2.34"
+
+prometheus:
+  ClientPort: 9090
+  extraArgs:
+    storage.tsdb.retention.time: 15d
+    storage.tsdb.path: /opt/app/prometheus/data
+    config.file: /etc/prometheus.yml
+    web.enable-lifecycle:
+    web.enable-admin-api:
+
+livenessProbe:
+  enabled: true
+  path: /-/healthy
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 120
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  path: /-/ready
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 120
+  successThreshold: 1
+
+startPolicy:
+  enabled: false
+  command:
+    - sleep
+  args:
+    - infinity
+
+dataSavePath:
+  containerDataPath: /opt/app/prometheus/data
+  localDataPath: /opt/app/prometheus/data
+  type: DirectoryOrCreate
+
+resources:
+   limits:
+     cpu: "1"
+     memory: 1024Mi
+   requests:
+     cpu: "1"
+     memory: 1024Mi
+
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: NodePort
+  port: 9090
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
