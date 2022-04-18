@@ -1,0 +1,12 @@
+{{- if .Values.grafana.configmap }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "grafana.configname" . }}
+  namespace: {{ .Release.Name }}-{{ .Values.global.namespace.prefix }}
+  labels:
+    app: {{ template "grafana.configname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- end }}
