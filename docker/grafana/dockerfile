@@ -1,0 +1,12 @@
+# jdk基础镜像
+FROM devops.wangtianci.com/module/jdk-base:1.8.0_271
+
+MAINTAINER "wangtianci"
+
+ADD grafana.tar.gz /opt/app
+
+WORKDIR /opt/app/grafana
+
+# 测试镜像使用，在生产环境中需注释
+ENTRYPOINT ["./bin/grafana-server"]
+# CMD ["sleep","3600"]
