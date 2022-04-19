@@ -39,3 +39,10 @@ data:
       relabel_configs:
       - action: labelmap
         regex: __meta_kubernetes_node_label_(.+)
+    - job_name: 'kube-state-metrics'
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+        - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_endpoints_name]
+          regex: {{ .Release.Name }}-{{ .Values.global.namespace.prefix }};{{ .Release.Name }}-kube-state-metrics
+          action: keep
