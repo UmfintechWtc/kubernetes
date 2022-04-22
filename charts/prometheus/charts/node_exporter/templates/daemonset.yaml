@@ -16,6 +16,10 @@ spec:
       labels:
         {{- include "node-exporter.selectorLabels" . | nindent 8 }}
     spec:
+      tolerations:
+      - key: "node-role.kubernetes.io/master"
+        operator: "Exists"
+        effect: "NoSchedule"
       serviceAccountName: {{ include "node-exporter.serviceAccountName" . }}
       containers:
         - name: {{ template "node-exporter.fullname" . }}
