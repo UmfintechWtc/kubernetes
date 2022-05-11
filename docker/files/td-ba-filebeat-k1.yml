@@ -1,0 +1,300 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    deprecated.daemonset.template.generation: "24"
+  creationTimestamp: "2021-02-22T11:17:07Z"
+  generation: 24
+  labels:
+    k8s-app: td-ba-filebeat-k1
+  managedFields:
+  - apiVersion: apps/v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:annotations:
+          .: {}
+          f:deprecated.daemonset.template.generation: {}
+        f:labels:
+          .: {}
+          f:k8s-app: {}
+      f:spec:
+        f:revisionHistoryLimit: {}
+        f:selector:
+          f:matchLabels:
+            .: {}
+            f:k8s-app: {}
+        f:template:
+          f:metadata:
+            f:labels:
+              .: {}
+              f:k8s-app: {}
+          f:spec:
+            f:containers:
+              k:{"name":"td-ba-dot-filebeat-exporter"}:
+                .: {}
+                f:command: {}
+                f:image: {}
+                f:imagePullPolicy: {}
+                f:name: {}
+                f:ports:
+                  .: {}
+                  k:{"containerPort":6080,"protocol":"TCP"}:
+                    .: {}
+                    f:containerPort: {}
+                    f:hostPort: {}
+                    f:name: {}
+                    f:protocol: {}
+                f:resources:
+                  .: {}
+                  f:limits:
+                    .: {}
+                    f:cpu: {}
+                    f:memory: {}
+                  f:requests:
+                    .: {}
+                    f:cpu: {}
+                    f:memory: {}
+                f:securityContext:
+                  .: {}
+                  f:privileged: {}
+                f:terminationMessagePath: {}
+                f:terminationMessagePolicy: {}
+              k:{"name":"td-ba-filebeat-k1"}:
+                .: {}
+                f:args: {}
+                f:env:
+                  .: {}
+                  k:{"name":"ELASTIC_CONTAINER"}:
+                    .: {}
+                    f:name: {}
+                    f:value: {}
+                  k:{"name":"GODEBUG"}:
+                    .: {}
+                    f:name: {}
+                    f:value: {}
+                  k:{"name":"LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE"}:
+                    .: {}
+                    f:name: {}
+                    f:value: {}
+                  k:{"name":"NODE_NAME"}:
+                    .: {}
+                    f:name: {}
+                    f:valueFrom:
+                      .: {}
+                      f:fieldRef:
+                        .: {}
+                        f:apiVersion: {}
+                        f:fieldPath: {}
+                  k:{"name":"PATH"}:
+                    .: {}
+                    f:name: {}
+                    f:value: {}
+                f:image: {}
+                f:imagePullPolicy: {}
+                f:name: {}
+                f:resources:
+                  .: {}
+                  f:limits:
+                    .: {}
+                    f:cpu: {}
+                    f:memory: {}
+                  f:requests:
+                    .: {}
+                    f:cpu: {}
+                    f:memory: {}
+                f:securityContext:
+                  .: {}
+                  f:runAsUser: {}
+                f:terminationMessagePath: {}
+                f:terminationMessagePolicy: {}
+                f:volumeMounts:
+                  .: {}
+                  k:{"mountPath":"/etc/filebeat.yml"}:
+                    .: {}
+                    f:mountPath: {}
+                    f:name: {}
+                    f:readOnly: {}
+                    f:subPath: {}
+                  k:{"mountPath":"/usr/share/filebeat/data"}:
+                    .: {}
+                    f:mountPath: {}
+                    f:name: {}
+                  k:{"mountPath":"/var/lib/docker/containers"}:
+                    .: {}
+                    f:mountPath: {}
+                    f:name: {}
+                    f:readOnly: {}
+            f:dnsPolicy: {}
+            f:hostNetwork: {}
+            f:imagePullSecrets:
+              .: {}
+              k:{"name":"qcloudregistrykey"}:
+                .: {}
+                f:name: {}
+            f:restartPolicy: {}
+            f:schedulerName: {}
+            f:securityContext: {}
+            f:terminationGracePeriodSeconds: {}
+            f:volumes:
+              .: {}
+              k:{"name":"config"}:
+                .: {}
+                f:configMap:
+                  .: {}
+                  f:defaultMode: {}
+                  f:name: {}
+                f:name: {}
+              k:{"name":"data"}:
+                .: {}
+                f:hostPath:
+                  .: {}
+                  f:path: {}
+                  f:type: {}
+                f:name: {}
+              k:{"name":"varlibdockercontainers"}:
+                .: {}
+                f:hostPath:
+                  .: {}
+                  f:path: {}
+                  f:type: {}
+                f:name: {}
+        f:updateStrategy:
+          f:rollingUpdate:
+            .: {}
+            f:maxUnavailable: {}
+          f:type: {}
+    manager: tke-apiserver
+    operation: Update
+    time: "2022-01-21T01:38:30Z"
+  - apiVersion: apps/v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:status:
+        f:currentNumberScheduled: {}
+        f:desiredNumberScheduled: {}
+        f:numberAvailable: {}
+        f:numberMisscheduled: {}
+        f:numberReady: {}
+        f:observedGeneration: {}
+        f:updatedNumberScheduled: {}
+    manager: kube-controller-manager
+    operation: Update
+    time: "2022-03-01T18:09:42Z"
+  name: td-ba-filebeat-k1
+  namespace: devops
+  resourceVersion: "18639013599"
+  selfLink: /apis/apps/v1/namespaces/devops/daemonsets/td-ba-filebeat-k1
+  uid: bc7014eb-2786-4027-b561-d34417d9b59d
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: td-ba-filebeat-k1
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        k8s-app: td-ba-filebeat-k1
+    spec:
+      containers:
+      - args:
+        - -c
+        - /etc/filebeat.yml
+        - -e
+        env:
+        - name: PATH
+          value: /usr/share/filebeat:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        - name: ELASTIC_CONTAINER
+          value: "true"
+        - name: GODEBUG
+          value: madvdontneed=1
+        - name: LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE
+          value: /
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        image: ccr.ccs.tencentyun.com/teddy_repo/td-ba-filebeat:7.11.1
+        imagePullPolicy: IfNotPresent
+        name: td-ba-filebeat-k1
+        resources:
+          limits:
+            cpu: "2"
+            memory: 1000Mi
+          requests:
+            cpu: 200m
+            memory: 500Mi
+        securityContext:
+          runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/filebeat.yml
+          name: config
+          readOnly: true
+          subPath: filebeat.yml
+        - mountPath: /usr/share/filebeat/data
+          name: data
+        - mountPath: /var/lib/docker/containers
+          name: varlibdockercontainers
+          readOnly: true
+      - command:
+        - ./beat-exporter
+        - --beat.uri
+        - http://localhost:5166
+        - --web.listen-address
+        - 0.0.0.0:6080
+        image: ccr.ccs.tencentyun.com/teddy_repo/td-ba-beat-exporter-master:202103251636.46ef0812
+        imagePullPolicy: IfNotPresent
+        name: td-ba-dot-filebeat-exporter
+        ports:
+        - containerPort: 6080
+          hostPort: 6080
+          name: metrics
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 100m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        securityContext:
+          privileged: false
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      imagePullSecrets:
+      - name: qcloudregistrykey
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 416
+          name: filebeat-config-k1
+        name: config
+      - hostPath:
+          path: /data/app/logs
+          type: ""
+        name: varlibdockercontainers
+      - hostPath:
+          path: /var/lib/filebeat-data
+          type: DirectoryOrCreate
+        name: data
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+status:
+  currentNumberScheduled: 68
+  desiredNumberScheduled: 68
+  numberAvailable: 68
+  numberMisscheduled: 0
+  numberReady: 68
+  observedGeneration: 24
+  updatedNumberScheduled: 68

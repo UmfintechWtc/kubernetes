@@ -1,0 +1,64 @@
+# 操作系统基础镜像
+FROM centos:centos7.9.2009
+# 打包的人
+MAINTAINER "devops@teddymobile.cn"
+
+# 运行
+RUN rm -f /etc/localtime \
+    && ln -sv /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "Asia/Shanghai" > /etc/timezone \
+    && yum install epel-release -y \
+    && rpm -v --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro \
+    && rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm \
+    && yum install -y wget vim net-tools unzip zip ffmpeg ffmpeg-devel \
+    && mkdir /usr/local/agents \
+    && wget http://wget.teddymobile.net/jdk-8u271-linux-x64.tar.gz \
+    && tar xf jdk-8u271-linux-x64.tar.gz && mv jdk1.8.0_271 /usr/local/ \
+    && wget http://wget.teddymobile.net/skywalking/skywalking-agent.tar.gz \
+    && tar xf skywalking-agent.tar.gz && mv skywalking /usr/local/agents/ \
+    && wget http://wget.teddymobile.net/prometheus-agent.tar.gz \
+    && tar xf prometheus-agent.tar.gz && mv prometheus /usr/local/agents/ \
+    && rm -rf prometheus-agent.tar.gz jdk-8u271-linux-x64.tar.gz skywalking-agent.tar.gz
+
+
+# 定义环境变量
+ENV JAVA_HOME /usr/local/jdk1.8.0_271/
+ENV PATH $JAVA_HOME/bin:$PATH
+
+# 设置编码
+ENV LC_ALL zh_CN.utf8
+ENV LANG zh_CN.utf8
+ENV LANGUAGE zh_CN.utf8
+RUN localedef -c -f UTF-8 -i zh_CN zh_CN.utf8
+
+# 启动容器执行的命令，仅用于验证安装配置是否正确，生产环境使用需注释后再build
+#CMD ["java","-version"]
+
+# jdk基础镜像
+FROM ccr.ccs.tencentyun.com/teddy_repo/td-jdk1.8:1.0
+
+# 打包人
+MAINTAINER "devops@teddymobile.cn"
+
+# 定义数据卷，默认挂载到/tmp目录
+VOLUME /tmp
+
+# 应用jar文件,可以由外部jenkins传入
+ARG JAR_FILE_PATH=target
+
+# 定义变量
+ENV APP_HOME=/
+# JAVA_OPTS="-Dspring.profiles.active=prod -Djava.security.egd=file:/dev/./urandom"
+ENV JAVA_OPTS=""
+
+# 定义工作目录
+WORKDIR $APP_HOME
+
+# 拷贝应用JAR文件到容器中
+ADD $JAR_FILE_PATH/*.jar $APP_HOME/app.jar
+
+# 声明端口
+EXPOSE 8080
+
+# 执行命令
+CMD ["sh", "-c", "java $JAVA_OPTS -jar $APP_HOME/app.jar "]

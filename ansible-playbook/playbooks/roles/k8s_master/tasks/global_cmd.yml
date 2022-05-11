@@ -10,7 +10,7 @@
 #- name: Create cluster role
 #  shell: |
 #    source /etc/profile.d/k8s-master.sh
-#    kubectl create clusterrolebinding kubelet-bootstrap \
+#    kubectl create clusterrolebinding.yaml kubelet-bootstrap \
 #      --clusterrole=system:node-bootstrapper \
 #      --user=kubelet-bootstrap
 #  ignore_errors: True
@@ -34,7 +34,7 @@
     ssh {{ app.user }}@{{ host }} "mkdir /root/.kube"
     scp -r /root/.kube/config {{ app.user }}@{{ host }}:/root/.kube
   with_items:
-    - "{{ groups['h8s_node'] }}"
+    - "{{ groups['k8s_node'] }}"
   loop_control:
     loop_var: host
   ignore_errors: True

@@ -7,6 +7,9 @@ cd {{ etcd_bin_path }}
 #  --endpoints="{% for host in groups['etcd'] %}https://{{ hostvars[host]['ansible_host'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}" \
 #  endpoint health
 
+# --- --prefix --keys-only 查看所有节点
+
+
 ETCDCTL_API=2 ./etcdctl \
   --endpoints="{% for host in groups['etcd'] %}https://{{ hostvars[host]['ansible_host'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}" \
   --ca-file={{ etcd_ssl_path }}/ca.pem \
