@@ -32,7 +32,7 @@
 - name: Unarchive helm-push
   unarchive:
     src: helm-push.tar.gz
-    dest: "{{ plugin_path }}"
+    dest: "{{ plugin_path }}/helm-push"
     owner: "{{ app.user }}"
     group: "{{ app.group }}"
     mode: 0755
