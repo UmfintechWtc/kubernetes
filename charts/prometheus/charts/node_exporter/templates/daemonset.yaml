@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "node-exporter.fullname" . }}
+  namespace: {{ .Release.Name }}-{{ .Values.global.namespace.prefix }}
+  labels:
+    {{- include "node-exporter.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "node-exporter.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "node-exporter.selectorLabels" . | nindent 8 }}
+    spec:
+      tolerations:
+      - key: "node-role.kubernetes.io/master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      serviceAccountName: {{ include "node-exporter.serviceAccountName" . }}
+      containers:
+        - name: {{ template "node-exporter.fullname" . }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.startPolicy.enabled }}
+          command: {{- toYaml .Values.startPolicy.command | nindent 12 }}
+          args: {{- toYaml .Values.startPolicy.args | nindent 12 }}
+          {{- else }}
+          args:
+            - --web.listen-address=0.0.0.0:{{ .Values.node_exporter.ClientPort }}
+            {{- range $key, $value := .Values.node_exporter.extraArgs }}
+            {{- if $value }}
+            - --{{ $key }}={{ $value }}
+            {{- else }}
+            - --{{ $key }}
+            {{- end }}
+            {{- end }}
+          {{- end }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.node_exporter.ClientPort }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            httpGet:
+              path: /
+              port: metrics
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            httpGet:
+              path: /
+              port: metrics
+          volumeMounts:
+            - name: proc
+              mountPath: /host/proc
+              readOnly: true
+            - name: sys
+              mountPath: /host/sys
+              readOnly: true
+      dnsPolicy: ClusterFirst
+      hostNetwork: {{ .Values.node_exporter.hostNetwork }}
+      hostPID: {{ .Values.node_exporter.hostPID }}
+      hostIPC: {{ .Values.node_exporter.hostIPC }}
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: sys
+          hostPath:
+            path: /sys
+

@@ -1,0 +1,16 @@
+# jdk基础镜像
+FROM devops.wangtianci.com/module/jdk-base:1.8.0_271
+
+MAINTAINER "wangtianci"
+
+ADD prometheus.tar.gz /opt/app
+
+ENV PATH /opt/app/prometheus:$PATH
+
+WORKDIR /opt/app/prometheus
+
+RUN mkdir -pvm 755 data
+
+# 测试镜像使用，在生产环境中需注释
+ENTRYPOINT ["./prometheus"]
+# CMD ["sleep","3600"]

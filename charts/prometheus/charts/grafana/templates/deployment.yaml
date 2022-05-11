@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "grafana.fullname" . }}
+  namespace: {{ .Release.Name }}-{{ .Values.global.namespace.prefix }}
+  labels:
+    {{- include "grafana.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "grafana.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "grafana.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ include "grafana.fullname" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.startPolicy.enabled }}
+          command: {{- toYaml .Values.startPolicy.command | nindent 12 }}
+          args: {{- toYaml .Values.startPolicy.args | nindent 12 }}
+          {{- else }}
+          args:
+            {{- range $key, $value := .Values.grafana.extraArgs }}
+            {{- if $value }}
+            - --{{ $key }}={{ $value }}
+            {{- end }}
+            {{- end }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.readinessProbe.path }}
+              port: grafana
+              scheme: {{ .Values.readinessProbe.scheme }}
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.livenessProbe.path }}
+              port: grafana
+              scheme: {{ .Values.livenessProbe.scheme }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          ports:
+            - name: grafana
+              containerPort: {{ .Values.grafana.ClientPort }}
+              protocol: TCP
+          volumeMounts:
+            - name: grafana-datadir
+              mountPath: {{ .Values.dataSavePath.containerDataPath }}
+            - name: grafana-logs
+              mountPath: {{ .Values.dataSavePath.containerLogsPath }}
+      dnsPolicy: ClusterFirst
+      volumes:
+        - name: grafana-datadir
+          hostPath:
+            path: {{ .Values.dataSavePath.localDataPath }}
+            type: {{ .Values.dataSavePath.type }}
+        - name: grafana-logs
+          hostPath:
+            path: {{ .Values.dataSavePath.localLogsPath }}
+            type: {{ .Values.dataSavePath.type }}

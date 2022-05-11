@@ -1,0 +1,97 @@
+replicaCount: 1
+
+image:
+  repository: devops.wangtianci.com/open/grafana
+  pullPolicy: IfNotPresent
+  tag: "v8.4.5"
+
+grafana:
+  configmap: false
+  Userame: admin
+  Password: admin
+  ClientPort: 3000
+  extraArgs:
+    homepath: /opt/app/grafana
+    config: /opt/app/grafana/conf/grafana.ini
+
+livenessProbe:
+  enabled: true
+  path: /api/health
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 120
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  path: /api/health
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 120
+  successThreshold: 1
+
+startPolicy:
+  enabled: false
+  command:
+    - sleep
+  args:
+    - infinity
+
+dataSavePath:
+  containerDataPath: /var/lib/grafana
+  containerLogsPath: /var/log/grafana
+  localDataPath: /opt/app/grafanas/data
+  localLogsPath: /opt/app/grafanas/logs
+  type: DirectoryOrCreate
+
+resources:
+   limits:
+     cpu: "1"
+     memory: 1024Mi
+   requests:
+     cpu: "1"
+     memory: 1024Mi
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: NodePort
+  port: 3000
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

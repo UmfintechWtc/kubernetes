@@ -1,0 +1,83 @@
+replicaCount: 1
+
+image:
+  repository: devops.wangtianci.com/open/kube-state-metrics
+  pullPolicy: IfNotPresent
+  tag: "v2.4.2"
+
+kube_state_metrics:
+  ClientPort: 8080
+  TelemetryPort: 8081
+
+startPolicy:
+  enabled: false
+  command:
+    - sleep
+  args:
+    - infinity
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 120
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+
+resources:
+   limits:
+     cpu: "1"
+     memory: 1024Mi
+   requests:
+     cpu: "1"
+     memory: 1024Mi
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
