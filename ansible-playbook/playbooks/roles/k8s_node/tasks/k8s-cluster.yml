@@ -13,6 +13,15 @@
     loop_var: host
   ignore_errors: True
 
+- name: k8s node add label
+  shell: |
+    kubectl label node {{ hostvars[host]['ansible_host'] }} node-role.kubernetes.io/node=node
+  with_items:
+    - "{{ groups['k8s_node'][3:] }}"
+  loop_control:
+    loop_var: host
+  ignore_errors: True
+
 - name: Check k8s cluster status
   shell: |
     kubectl get nodes
