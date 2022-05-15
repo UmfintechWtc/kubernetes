@@ -2,7 +2,7 @@ global:
   zookeeper:
     replicaCount: 3
   kafka:
-    replicaCount: 1
+    replicaCount: 3
   minServerId: 1
 
 image:

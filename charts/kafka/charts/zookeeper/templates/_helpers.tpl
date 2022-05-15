@@ -51,6 +51,7 @@ Common labels
 {{ include "zookeeper.selectorLabels" . }}
 app.kubernetes.io/apiversion: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: Helm
+app.deploy.service: {{ .Chart.Name }}
 {{- end }}
 
 {{/*

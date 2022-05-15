@@ -23,6 +23,16 @@ spec:
       name: {{ template "kafka.fullname" . }}
       labels: {{- include "kafka.labels" . | nindent 8 }}
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app.deploy.service
+                operator: In
+                values:
+                - {{ .Chart.Name }}
+            topologyKey: node-role.kubernetes.io/node
       serviceAccountName: {{ template "kafka.serviceAccountName" . }}
       containers:
         - name: {{ template "kafka.fullname" . }}

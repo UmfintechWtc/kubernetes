@@ -23,7 +23,19 @@ spec:
       name: {{ template "zookeeper.fullname" . }}
       labels: {{- include "zookeeper.labels" . | nindent 8 }}
     spec:
-      serviceAccountName: {{ template "zookeeper.serviceAccountName" . }}
+      # https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+#      nodeSelector:
+#        node-role.kubernetes.io/node: node
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app.deploy.service
+                operator: In
+                values:
+                - {{ .Chart.Name }}
+            topologyKey: node-role.kubernetes.io/node
       containers:
         - name: {{ template "zookeeper.fullname" . }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
