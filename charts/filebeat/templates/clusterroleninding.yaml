@@ -6,7 +6,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: {{ include "filebeat.serviceAccountName" . }}
-  namespace: kube-system
+  namespace: {{ template "filebeat.namespace" . }}
 roleRef:
   kind: ClusterRole
   name: {{ include "filebeat.fullname" . }}

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: {{ include "filebeat.fullname" . }}
-  namespace: kube-system
+  namespace: {{ template "filebeat.namespace" . }}
   labels:
     {{- include "filebeat.labels" . | nindent 4 }}
 spec:
@@ -48,6 +48,8 @@ spec:
               mountPath: {{ .Values.dataSavePath.containerLogPath }}
             - name: filebeat-datadir
               mountPath: {{ .Values.dataSavePath.containerDataPath }}
+            - name: filebeat-logdir
+              mountPath: {{ .Values.dataSavePath.serviceContainerLogPath }}
       dnsPolicy: ClusterFirst
       volumes:
         - name: filebeat-config
@@ -64,4 +66,8 @@ spec:
         - name: filebeat-datadir
           hostPath:
             path: {{ .Values.dataSavePath.localDataPath }}
+            type: {{ .Values.dataSavePath.type }}
+        - name: filebeat-logdir
+          hostPath:
+            path: {{ .Values.dataSavePath.serviceLocalLogPath }}
             type: {{ .Values.dataSavePath.type }}

@@ -16,6 +16,8 @@ elasticsearch:
   password: g8UiNqgnfwqW
 
 dataSavePath:
+  serviceContainerLogPath: /opt/app/filebeat/logs
+  serviceLocalLogPath: /opt/app/filebeat/logs
   localLogPath: /opt/app/kubernetes/docker/containers
   containerLogPath: /var/lib/docker/containers
   systemLogPath: /var/log
@@ -30,6 +32,11 @@ startPolicy:
     - sleep
   args:
     - infinity
+
+downstream:
+  kafka: false
+  kafka_address: servicename.namespace.svc.cluster.local
+  es_address: xxxx:9200
 
 imagePullSecrets: []
 nameOverride: ""

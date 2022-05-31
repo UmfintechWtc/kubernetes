@@ -6,6 +6,13 @@ Expand the name of the chart.
 {{- end }}
 
 {{/*
+Create filebeat namespace
+*/}}
+{{- define "filebeat.namespace" -}}
+{{- default (include "filebeat.fullname" .) }}
+{{- end }}
+
+{{/*
 Create filebeat configmap
 */}}
 {{- define "filebeat.configname" -}}

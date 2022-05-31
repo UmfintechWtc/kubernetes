@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "filebeat.configname" . }}
-  namespace: kube-system
+  namespace: {{ template "filebeat.namespace" . }}
   labels:
     app: {{ template "filebeat.configname" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
@@ -75,11 +75,101 @@ data:
             - offset
           ignore_missing: true
     output.elasticsearch:
-      hosts: ["xxx:9200","xxx:9200","xxx:9200"]
+      hosts: ["10.22.33.37:9200","10.22.33.38:9200","10.22.33.39:9200"]
       index: "wtc-log-test-%{+yyyy.MM.dd}"
       partition.round_robin:
         reachable_only: true
       username: {{ .Values.elasticsearch.user | quote }}
       password: {{ .Values.elasticsearch.password | quote }}
+    setup.ilm.enabled: false
+    setup.template.enabled: falseapiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "filebeat.configname" . }}
+  namespace: {{ template "filebeat.namespace" . }}
+  labels:
+    app: {{ template "filebeat.configname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  filebeat-config: |
+    filebeat.inputs:
+    - type: container
+      enabled: true
+      paths:
+      - /var/lib/docker/containers/*/*.log
+      multiline.pattern: '^(\{|\[)[0-9]{4}-[0-9]{2}-[0-9]{2}|^[0-9]{4}-[0-9]{2}-[0-9]{2}|^[0-9]'
+      multiline.negate: true
+      multiline.match: after
+      multiline.timeout: 10s
+    filebeat.config.modules:
+      path: ${path.config}/modules.d/*.yml
+      reload.enabled: true
+    processors:
+      - add_kubernetes_metadata:
+          default_indexers.enabled: true
+          default_matchers.enabled: true
+          host: ${NODE_NAME}
+          matchers:
+          - logs_path:
+              logs_path: "/var/lib/docker/containers/*/*.log"
+      - script:
+          lang: javascript
+          id: format_k8s
+          tag: enable
+          source: >
+            function process(event) {
+                var k8s=event.Get("kubernetes");
+                var newK8s = {
+                    podName: k8s.pod.name,
+                    nameSpace: k8s.namespace,
+                    imageAddr: k8s.container.name,
+                    hostName: k8s.node.name,
+                    k8sName: "TianCiwang_Test_Kubernetes"
+                }
+                event.Put("k8s", newK8s);
+            }
+      - drop_fields:
+          fields:
+            - kubernetes.pod.uid
+            - kubernetes.namespace_uid
+            - kubernetes.namespace_labels
+            - kubernetes.node.uid
+            - kubernetes.node.labels
+            - kubernetes.replicaset
+            - kubernetes.labels
+            - kubernetes.node.name
+            - kubernetes.pod.name
+            - kubernetes.container.image
+            - kubernetes.container.name
+            - kubernetes.namespace
+            - kubernetes.statefulset.name
+            - log.offset
+            - container
+            - kubernetes
+            - _id
+            - _index
+            - _score
+            - _type
+            - agent
+            - input
+            - ecs
+            - stream
+            - offset
+          ignore_missing: true
+    {{- if .Values.downstream.kafka }}
+    output.kafka:
+      hosts: [{{ .Values.downstream.kafka_address | quote }}]
+      topic: '%{[k8s.k8sName]}-%{[k8s.nameSpace]}'
+    {{- else }}
+    output.elasticsearch:
+      hosts: [{{ .Values.downstream.es_address | quote }}]
+      index: "wtc-log-test-%{+yyyy.MM.dd}"
+      username: {{ .Values.elasticsearch.user | quote }}
+      password: {{ .Values.elasticsearch.password | quote }}
+    {{- end }}
+      partition.round_robin:
+        reachable_only: true
     setup.ilm.enabled: false
     setup.template.enabled: false
