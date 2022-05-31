@@ -75,7 +75,7 @@ data:
             - offset
           ignore_missing: true
     output.elasticsearch:
-      hosts: ["10.22.33.37:9200","10.22.33.38:9200","10.22.33.39:9200"]
+      hosts: ["xxx:9200","xxx:9200","xxx:9200"]
       index: "wtc-log-test-%{+yyyy.MM.dd}"
       partition.round_robin:
         reachable_only: true
