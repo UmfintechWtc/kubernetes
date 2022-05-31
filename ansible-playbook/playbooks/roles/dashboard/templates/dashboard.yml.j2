@@ -195,7 +195,9 @@ spec:
               - key: node-role.kubernetes.io/node
                 operator: In
                 values:
-                - node
+{% for host in groups['k8s_node'][3:] %}
+                - {{ host }}
+{% endfor %}
       containers:
         - name: kubernetes-dashboard
           image: {{ DockerRegistry }}/base/{{ dashboard_repository.split("/")[1] }}
@@ -288,7 +290,9 @@ spec:
               - key: node-role.kubernetes.io/node
                 operator: In
                 values:
-                - node
+{% for host in groups['k8s_node'][3:] %}
+                - {{ host }}
+{% endfor %}
       containers:
         - name: dashboard-metrics-scraper
           image: {{ DockerRegistry }}/base/{{ metrics_repository.split("/")[1] }}
