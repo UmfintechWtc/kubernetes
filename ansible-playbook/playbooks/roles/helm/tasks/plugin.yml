@@ -21,10 +21,18 @@
   wait_for:
     path: "{{ plugin_path }}"
 
+- name: create helm-push dir
+  file:
+    path: "{{ plugin_path }}/helm-push"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    state: directory
+    mode: 0755
+
 - name: Unarchive helm-push
   unarchive:
     src: helm-push.tar.gz
-    dest: "{{ plugin_path }}"
+    dest: "{{ plugin_path }}/helm-push"
     owner: "{{ app.user }}"
     group: "{{ app.group }}"
     mode: 0755

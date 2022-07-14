@@ -187,6 +187,17 @@ spec:
       labels:
         k8s-app: kubernetes-dashboard
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/node
+                operator: In
+                values:
+{% for host in groups['k8s_node'][3:] %}
+                - {{ host }}
+{% endfor %}
       containers:
         - name: kubernetes-dashboard
           image: {{ DockerRegistry }}/base/{{ dashboard_repository.split("/")[1] }}
@@ -226,8 +237,8 @@ spec:
         - name: tmp-volume
           emptyDir: {}
       serviceAccountName: kubernetes-dashboard
-      nodeSelector:
-        "kubernetes.io/os": linux
+#      nodeSelector:
+#        "kubernetes.io/os": linux
       # Comment the following tolerations if Dashboard must not be deployed on master
       tolerations:
         - key: node-role.kubernetes.io/master
@@ -271,6 +282,17 @@ spec:
       annotations:
         seccomp.security.alpha.kubernetes.io/pod: 'runtime/default'
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/node
+                operator: In
+                values:
+{% for host in groups['k8s_node'][3:] %}
+                - {{ host }}
+{% endfor %}
       containers:
         - name: dashboard-metrics-scraper
           image: {{ DockerRegistry }}/base/{{ metrics_repository.split("/")[1] }}
@@ -294,8 +316,8 @@ spec:
             runAsUser: 1001
             runAsGroup: 2001
       serviceAccountName: kubernetes-dashboard
-      nodeSelector:
-        "kubernetes.io/os": linux
+#      nodeSelector:
+#        "kubernetes.io/os": linux
       # Comment the following tolerations if Dashboard must not be deployed on master
       tolerations:
         - key: node-role.kubernetes.io/master

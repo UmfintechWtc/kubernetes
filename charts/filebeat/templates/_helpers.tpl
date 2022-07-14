@@ -1,22 +1,22 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "zookeeper.name" -}}
-{{- default .Chart.Name  | trunc 63 | trimSuffix "-" }}
+{{- define "filebeat.name" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
-Create zookeeper namespace
+Create filebeat namespace
 */}}
-{{- define "zookeeper.namespace" -}}
-{{- default (include "zookeeper.fullname" .) }}
+{{- define "filebeat.namespace" -}}
+{{- default (include "filebeat.fullname" .) }}
 {{- end }}
 
 {{/*
-Create zookeeper configmap
+Create filebeat configmap
 */}}
-{{- define "zookeeper.configname" -}}
-{{- default (include "zookeeper.fullname" .) }}
+{{- define "filebeat.configname" -}}
+{{- default (include "filebeat.fullname" .) }}
 {{- end }}
 
 {{/*
@@ -24,7 +24,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "zookeeper.fullname" -}}
+{{- define "filebeat.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -40,34 +40,36 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "zookeeper.chart" -}}
+{{- define "filebeat.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "zookeeper.labels" -}}
-{{ include "zookeeper.selectorLabels" . }}
-app.kubernetes.io/apiversion: {{ .Chart.AppVersion | quote }}
-app.kubernetes.io/managed-by: Helm
-app.deploy.service: {{ .Chart.Name }}
+{{- define "filebeat.labels" -}}
+helm.sh/chart: {{ include "filebeat.chart" . }}
+{{ include "filebeat.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
 Selector labels
 */}}
-{{- define "zookeeper.selectorLabels" -}}
-app.kubernetes.io/name: {{ .Chart.Name }}
+{{- define "filebeat.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "filebeat.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "zookeeper.serviceAccountName" -}}
+{{- define "filebeat.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "zookeeper.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "filebeat.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

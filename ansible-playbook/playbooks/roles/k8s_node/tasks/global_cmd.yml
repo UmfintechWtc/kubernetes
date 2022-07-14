@@ -18,16 +18,3 @@
   shell: |
     source /etc/profile.d/k8s-node.sh
     sleep 30
-
-- name: k8s master approve node
-  shell: |
-    kubectl certificate approve `kubectl get csr | grep Pending | awk '{print $1}'`
-  run_once: true
-  delegate_to: "{{ groups['k8s_master'][0] }}"
-
-- name: Check k8s cluster status
-  shell: |
-    sleep 30
-    kubectl get nodes
-  run_once: true
-  delegate_to: "{{ groups['k8s_master'][0] }}"

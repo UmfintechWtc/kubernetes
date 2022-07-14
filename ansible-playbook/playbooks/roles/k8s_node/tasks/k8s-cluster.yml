@@ -1,0 +1,38 @@
+---
+- name: k8s master approve node
+  shell: |
+    kubectl certificate approve `kubectl get csr | grep Pending | awk '{print $1}'`
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+  ignore_errors: True
+
+- name: k8s master add label
+  shell: |
+    kubectl label node {{ hostvars[host]['ansible_host'] }} node-role.kubernetes.io/master=master
+  with_items:
+    - "{{ groups['k8s_master'] }}"
+  loop_control:
+    loop_var: host
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+  ignore_errors: True
+
+- name: k8s node add label
+  shell: |
+    kubectl label node {{ hostvars[host]['ansible_host'] }} node-role.kubernetes.io/node=node{{ ( groups['k8s_master'] | get_host_num( host_index, host )) }}
+  with_items:
+    - "{{ groups['k8s_node'][3:] }}"
+  loop_control:
+    loop_var: host
+    index_var: host_index
+  run_once: true
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+  ignore_errors: True
+
+- name: Check k8s cluster status
+  shell: |
+    kubectl get nodes
+  register: result
+
+- debug:
+    msg: "{{ result.stdout_lines }}"

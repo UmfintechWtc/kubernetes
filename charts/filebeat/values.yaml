@@ -1,0 +1,81 @@
+image:
+  repository: devops.wangtianci.com/open/filebeat
+  pullPolicy: Always
+  tag: "v7.8.0"
+
+resources:
+   limits:
+     cpu: "1"
+     memory: 1024Mi
+   requests:
+     cpu: "1"
+     memory: 1024Mi
+
+elasticsearch:
+  user: elastic
+  password: g8UiNqgnfwqW
+
+dataSavePath:
+  serviceContainerLogPath: /opt/app/filebeat/logs
+  serviceLocalLogPath: /opt/app/filebeat/logs
+  localLogPath: /opt/app/kubernetes/docker/containers
+  containerLogPath: /var/lib/docker/containers
+  systemLogPath: /var/log
+  containerSystemLogPath: /var/log
+  localDataPath: /opt/app/filebeat/data
+  containerDataPath: /opt/app/filebeat/data
+  type: DirectoryOrCreate
+
+startPolicy:
+  enabled: false
+  command:
+    - sleep
+  args:
+    - infinity
+
+downstream:
+  kafka: false
+  kafka_address: servicename.namespace.svc.cluster.local
+  es_address: xxxx:9200
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
