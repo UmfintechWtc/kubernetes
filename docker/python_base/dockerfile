@@ -1,16 +1,28 @@
 # 操作系统基础镜像
 FROM centos:centos7.9.2009
+
 # 打包的人
 MAINTAINER "wangtianci"
 
 # 基础路径
-RUN mkdir -pvm 755 /opt/app \
+RUN mkdir -pvm 755 /opt/workspace \
     /root/.pip/
 
 # 依赖源
 COPY ali-centos.repo /etc/yum.repos.d/
 COPY ali-epel.repo /etc/yum.repos.d/
 COPY pip.conf requirements.txt /root/.pip/
+
+# python部署包
+ADD 3.10_binary_pythonh.tar.gz /usr/local/include
+ADD 3.10_binary_pythonBin.tar.gz /usr/local/bin
+ADD 3.10_binary_python.tar.gz /usr/local/lib/
+ADD 3.10_binary_openssl.tar.gz /usr/local
+
+# 创建openssl soft file
+RUN ln -sv /usr/local/openssl/bin/openssl /usr/bin/openssl \
+    && ln -sv /usr/local/openssl/lib/libcrypto.so.1.1 /usr/lib64/libcrypto.so.1.1 \
+    && ln -sv  /usr/local/openssl/lib/libssl.so.1.1 /usr/lib64/libssl.so.1.1
 
 # yum基础依赖
 RUN yum install -y \
@@ -26,18 +38,8 @@ RUN yum install -y \
        gdbm-devel \
        tk-devel \
        readline-devel \
-       python3-pip
-
-# python部署包
-ADD 3.10_binary_pythonh.tar.gz /usr/local/include
-ADD 3.10_binary_pythonBin.tar.gz /usr/local/bin
-ADD 3.10_binary_python.tar.gz /usr/local/lib/
-ADD 3.10_binary_openssl.tar.gz /usr/local
-
-# 创建openssl soft file
-RUN ln -sv /usr/local/openssl/bin/openssl /usr/bin/openssl \
-    && ln -sv /usr/local/openssl/lib/libcrypto.so.1.1 /usr/lib64/libcrypto.so.1.1 \
-    && ln -sv  /usr/local/openssl/lib/libssl.so.1.1 /usr/lib64/libssl.so.1.1
+       python3-pip \
+    && pip3 install -r /root/.pip/requirements.txt
 
 # 时间同步
 RUN rm -f /etc/localtime \
