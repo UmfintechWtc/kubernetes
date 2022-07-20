@@ -1,0 +1,18 @@
+# jdk基础镜像
+FROM devops.wangtianci.com/module/jdk-base:1.8.0_271
+
+MAINTAINER "wangtianci"
+
+RUN mkdir -pvm 755 /opt/workspace
+
+ARG PROJECT_NAME
+
+ENV service_name=${PROJECT_NAME}
+
+COPY $service_name /opt/workspace/$service_name
+
+WORKDIR /opt/workspace/$service_name
+
+# 测试镜像使用，在生产环境中需注释
+# CMD ["sleep","3600"]
+ENTRYPOINT /bin/bash ./scripts/run.sh -c /opt/workspace/$service_name/deploy/xconf
