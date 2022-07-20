@@ -1,53 +1,57 @@
 ---
-variables:
-  GIT_SUBMODULE_STRATEGY: recursive
-
 stages:
-  - fortress_Build
-  - fortress_Make_Tar
+  - Code_Compilation
+  - Docker_Build
+  - Push_Repo
 
-fortress_build:
-  stage: fortress_Build
+hyper-engine_Code_Compilation:
+  stage: Code_Compilation
   script:
-    - cargo build --release
+    - echo "开始mvn编译"
+    - mvn clean package -DskipTests=true
+    - if [ $? -ne 0 ];then
+    - echo "`date +%Y-%m-%d" "%H:%M:%S` $CI_COMMIT_REF_NAME mvn 编译失败"
+    - fi
   artifacts:
     expire_in: 10 mins
     paths:
-      - target/release/$CI_PROJECT_NAME
+      - ../$CI_PROJECT_NAME
   only:
-    - /^[a-zA-Z].*/(develop|bugfix|hotfix)/.*$/
+    - /^[a-zA-Z].*(develop|bugfix|hotfix).*$/
     - master
+  tags:
+    - docker_build_image
 
-fortress_tarfile:
-  stage: fortress_Make_Tar
+hyper-engine_Docker_Build:
+  stage: Docker_Build
   needs:
-    - [fortress_build]
+    - [hyper-engine_Code_Compilation]
   before_script:
-    - if [ ! -d "$CI_BUILDS_DIR/Packages/$CI_PROJECT_NAME" ];then
-    - mkdir -pvm 755 $CI_BUILDS_DIR/Packages/$CI_PROJECT_NAME
+    - if [ ! -d "docker_build" ];then
+    - mkdir -pvm 755 docker_build
     - fi
   script:
-    - if [ -f ./target/release/$CI_PROJECT_NAME ];then
-    - echo "$CI_COMMIT_SHA" &>> ./target/release/ci_commit_sha_id
-    - tar -zcf "$CI_PROJECT_NAME"_"$CI_COMMIT_SHA".tar.gz target/release/$CI_PROJECT_NAME ./target/release/ci_commit_sha_id
-    - if [ $? -eq 0 ];then
-    - mv "$CI_PROJECT_NAME"_"$CI_COMMIT_SHA".tar.gz $CI_BUILDS_DIR/Packages/$CI_PROJECT_NAME
-    - if [ $? -eq 0 ];then
-    - echo "`date +%Y-%m-%d" "%H:%M:%S` $CI_COMMIT_REF_NAME  "$CI_PROJECT_NAME"_"$CI_COMMIT_SHA".tar.gz 拷贝$CI_BUILDS_DIR/Packages/$CI_PROJECT_NAME成功"
-    - else
-    - echo "`date +%Y-%m-%d" "%H:%M:%S` $CI_COMMIT_REF_NAME  "$CI_PROJECT_NAME"_"$CI_COMMIT_SHA".tar.gz 拷贝$CI_BUILDS_DIR/Packages/$CI_PROJECT_NAME失败"
-    - exit
-    - fi
-    - else
-    - echo "`date +%Y-%m-%d" "%H:%M:%S` $CI_COMMIT_REF_NAME "$CI_PROJECT_NAME"_"$CI_COMMIT_SHA".tar.gz 打包失败"
-    - exit
-    - fi
-    - else
-    - echo "`date +%Y-%m-%d" "%H:%M:%S` $CI_COMMIT_REF_NAME $CI_COMMIT_SHA 编译失败"
-    - exit
-    - fi
+    - cp dockerfile docker_build
+    - cd $CI_PROJECT_DIR/../
+    - cp -r $CI_PROJECT_NAME $CI_PROJECT_NAME/docker_build || true
+    - cd $CI_PROJECT_DIR/docker_build
+    - docker build -f dockerfile -t $CI_PROJECT_NAME:$CI_COMMIT_SHA --build-arg PROJECT_NAME=$CI_PROJECT_NAME .
   dependencies:
-    - fortress_build
+    - hyper-engine_Code_Compilation
   only:
-    - /^[a-zA-Z].*/(develop|bugfix|hotfix)/.*$/
+    - /^[a-zA-Z].*(develop|bugfix|hotfix).*$/
     - master
+  tags:
+    - docker_build_image
+
+hyper-engine_Image_Push_Repo:
+  stage: Push_Repo
+  script:
+    - docker tag $CI_PROJECT_NAME:$CI_COMMIT_SHA devops.wangtianci.com/module/$CI_PROJECT_NAME:$CI_COMMIT_SHA
+    - docker push devops.wangtianci.com/module/$CI_PROJECT_NAME:$CI_COMMIT_SHA
+    - docker rmi $CI_PROJECT_NAME:$CI_COMMIT_SHA
+  only:
+    - /^[a-zA-Z].*(develop|bugfix|hotfix).*$/
+    - master
+  tags:
+    - docker_build_image
