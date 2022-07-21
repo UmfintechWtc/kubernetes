@@ -18,7 +18,8 @@ ADD rust-1.61.0-x86_64-unknown-linux-gnu.tar.gz /opt/workspace
 WORKDIR /opt/workspace/rust-1.61.0-x86_64-unknown-linux-gnu
 
 # 安装rust环境
-RUN sh install.sh
+RUN yum install gcc* openssl openssl-devel git libpcap libpcap-devel -y \
+    && sh install.sh
 
 # 时间同步
 RUN rm -f /etc/localtime \

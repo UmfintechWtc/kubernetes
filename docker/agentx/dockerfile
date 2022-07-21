@@ -1,0 +1,17 @@
+# jdk基础镜像
+FROM devops.wangtianci.com/module/rust-base:v1.61
+
+MAINTAINER "wangtianci"
+
+ARG PROJECT_NAME
+
+ENV service_name=${PROJECT_NAME}
+
+COPY $service_name /opt/workspace/$service_name
+
+WORKDIR /opt/workspace/$service_name
+
+RUN cargo build --release
+
+# 测试镜像使用，在生产环境中需注释
+CMD ["sleep","3600"]
