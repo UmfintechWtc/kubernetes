@@ -1,0 +1,34 @@
+---
+stages:
+  - Docker_Build
+  - Push_Repo
+
+xpro_Docker_Build:
+  stage: Docker_Build
+  before_script:
+    - if [ ! -d "docker_build" ];then
+    - mkdir -pvm 755 docker_build
+    - fi
+  script:
+    - cp dockerfile docker_build
+    - cd $CI_PROJECT_DIR/../
+    - cp -r $CI_PROJECT_NAME $CI_PROJECT_NAME/docker_build || true
+    - cd $CI_PROJECT_DIR/docker_build
+    - docker build -f dockerfile -t $CI_PROJECT_NAME:$CI_COMMIT_SHA --build-arg PROJECT_NAME=$CI_PROJECT_NAME .
+  only:
+    - /^[a-zA-Z].*/(develop|bugfix|hotfix)/.*$/
+    - master
+  tags:
+    - docker_build_image
+
+xpro_Image_Push_Repo:
+  stage: Push_Repo
+  script:
+    - docker tag $CI_PROJECT_NAME:$CI_COMMIT_SHA devops.wangtianci.com/module/$CI_PROJECT_NAME:$CI_COMMIT_SHA
+    - docker push devops.wangtianci.com/module/$CI_PROJECT_NAME:$CI_COMMIT_SHA
+    - docker rmi $CI_PROJECT_NAME:$CI_COMMIT_SHA
+  only:
+    - /^[a-zA-Z].*(develop|bugfix|hotfix).*$/
+    - master
+  tags:
+    - docker_build_image
