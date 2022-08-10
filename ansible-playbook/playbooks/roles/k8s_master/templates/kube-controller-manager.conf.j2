@@ -1,6 +1,5 @@
 KUBE_CONTROLLER_MANAGER_OPTS="--allocate-node-cidrs=true \
   --cluster-cidr=10.244.0.0/16 \
-  --service-cluster-ip-range=10.1.0.0/16 \
   --node-cidr-mask-size=24 \
   --authentication-kubeconfig={{ k8s_master_cfg_path }}/kube-controller-manager.kubeconfig \
   --authorization-kubeconfig={{ k8s_master_cfg_path }}/kube-controller-manager.kubeconfig \
