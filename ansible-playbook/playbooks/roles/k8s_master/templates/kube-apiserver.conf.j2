@@ -37,7 +37,7 @@ KUBE_APISERVER_OPTS="--advertise-address={{ ansible_host }} \
   --service-account-issuer=https://kubernetes.default.svc.cluster.local \
   --service-account-key-file={{ k8s_master_ssl_path }}/apiserver.pem \
   --service-account-signing-key-file={{ k8s_master_ssl_path }}/apiserver-key.pem \
-  --service-cluster-ip-range=10.1.0.0/16 \
+  --service-cluster-ip-range=10.0.0.0/16 \
   --service-node-port-range=30000-50000 \
   --tls-cert-file={{ k8s_master_ssl_path }}/apiserver.pem \
   --tls-private-key-file={{ k8s_master_ssl_path }}/apiserver-key.pem"
