@@ -1,0 +1,14 @@
+---
+stages:
+  - Docker_Build
+
+MySQL_Docker_Build:
+  image: $harborUrl/base/centos:$centos
+  stage: Docker_Build
+  script:
+    - cd deploy/docker
+    - docker build -f dockerfile -t $harborUrl/$CI_PROJECT_NAME/$CI_PROJECT_NAME:$mysql --build-arg tag=$mysql --build-arg url=$harborUrl --build-arg name=$CI_PROJECT_NAME .
+    - docker push $harborUrl/$CI_PROJECT_NAME/$CI_PROJECT_NAME:$mysql
+    - docker rmi $harborUrl/$CI_PROJECT_NAME/$CI_PROJECT_NAME:$mysql
+  tags:
+    - docker-runner
