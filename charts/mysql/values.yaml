@@ -1,0 +1,30 @@
+# Default values for mysql.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+hostNetwork: false
+revisionHistoryLimit: 5
+
+image:
+  repository: harbor.in.starcross.cn/mysql/mysql
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "8.0.26"
+
+mysql:
+  rootPassword: MWFiYThGZWI1MDRL
+  datadir: /data
+
+
+securityContext: {}
+
+service:
+  type: NodePort
+  port: 32000
+
+
+resources: {}
+#  requests:
+#    cpu: "1"
+#    memory: "2048Mi"
