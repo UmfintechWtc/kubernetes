@@ -7,7 +7,7 @@
 - name: upload haproxy.cfg
   template:
     src: haproxy.cfg.j2
-    dest: "{{ haproxy_cfg_path }}"
+    dest: "{{ haproxy_cfg_path }}/haproxy.cfg"
 
 - name: docker login
   shell: |
@@ -19,6 +19,6 @@
       --name haproxy \
       --network host \
       --restart always \
-      -v {{ haproxy_cfg_path }}:/usr/local/etc/haproxy/haproxy.cfg \
-      {{ DockerRegistry }}/{{ haproxy_repository.split("/") }}
+      -v {{ haproxy_cfg_path }}/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg \
+      {{ DockerRegistry }}/base/{{ haproxy_repository.split("/")[1] }}
 
