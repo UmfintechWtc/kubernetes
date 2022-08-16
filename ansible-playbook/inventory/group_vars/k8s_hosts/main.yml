@@ -18,6 +18,7 @@ pause_repository: tianciwang/pause-amd64:3.1
 coredns_repository: tianciwang/coredns:v1.6.7
 dashboard_repository: tianciwang/dashboard:v2.1.0
 metrics_repository: tianciwang/metrics-scraper:v1.0.6
+haproxy_repository: tianciwang/haproxy:2.0.29
 
 # Harbor login information
 harbor_user: admin

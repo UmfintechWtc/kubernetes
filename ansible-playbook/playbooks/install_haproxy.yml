@@ -1,0 +1,5 @@
+- name: Install dashboard
+  hosts: hosts
+  gather_facts: no
+  roles:
+    - haproxy

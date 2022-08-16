@@ -29,6 +29,14 @@
   delegate_to: "{{ groups['k8s_master'][0] }}"
   ignore_errors: True
 
+- name: add master taint
+  shell: |
+    kubectl taint nodes {{ hostvars[host]['ansible_host'] }} node-role.kubernetes.io/master=:NoSchedule
+  with_items:
+    - "{{ groups['k8s_master'] }}"
+  loop_control:
+    loop_var: host
+
 - name: Check k8s cluster status
   shell: |
     kubectl get nodes

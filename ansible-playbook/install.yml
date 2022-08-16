@@ -2,6 +2,7 @@
 - include: playbooks/install_system_init.yml
 - include: playbooks/install_etcd.yml
 - include: playbooks/install_docker.yml
+- include: playbooks/install_haproxy.yml
 - include: playbooks/install_harbor.yml
 - include: playbooks/install_images.yml
 - include: playbooks/install_k8s_master.yml
