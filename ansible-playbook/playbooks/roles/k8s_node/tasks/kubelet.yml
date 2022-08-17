@@ -1,14 +1,11 @@
 ---
 - name: Create kubelet logs dir
   file:
-    path: "{{ item }}"
+    path: "{{ k8s_node_logs_path }}/kubelet"
     owner: "{{ app.user }}"
     group: "{{ app.group }}"
     state: directory
     mode: 0755
-  with_itmes:
-    - "{{ k8s_node_logs_path }}/kubelet"
-    - "{{ k8s_node_manifests }}"
 
 - name: Unarchive k8s-node
   unarchive:

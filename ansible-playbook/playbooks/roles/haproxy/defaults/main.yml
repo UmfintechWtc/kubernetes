@@ -1,2 +1,0 @@
----
-haproxy_cfg_path: "{{ app.home }}/haproxy/conf"
