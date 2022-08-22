@@ -1,0 +1,26 @@
+replicaCount: {{ service.mysql.replication }}
+hostNetwork: false
+revisionHistoryLimit: 5
+
+image:
+  repository: {{ harbor_url }}/mysql/mysql
+  pullPolicy: Always
+
+mysql:
+  rootPassword: {{ (( service.mysql.password | encryption_pwd )) }}
+  datadir: {{ starx.base }}/{{ service.mysql.mount_dir_name }}/mysql
+  logdir: {{ starx.base }}/{{ service.mysql.mount_dir_name }}/mysql
+
+securityContext: {}
+
+service:
+  type: NodePort
+  port: {{ service.mysql.port }}
+
+resources: 
+  requests:
+    cpu: "{{ k8s_mysql.resources.requests.cpu }}"
+    memory: "{{ k8s_mysql.resources.requests.memory }}"
+  limits:
+    cpu: "{{ k8s_mysql.resources.limits.cpu }}"
+    memory: "{{ k8s_mysql.resources.limits.memory }}"
