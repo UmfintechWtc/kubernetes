@@ -1,11 +1,14 @@
 ---
-- name: Create kubelet logs dir
+- name: Create kubelet logs and staticPodPath dir
   file:
-    path: "{{ k8s_node_logs_path }}/kubelet"
+    path: "{{ item }}"
     owner: "{{ app.user }}"
     group: "{{ app.group }}"
     state: directory
     mode: 0755
+  with_items:
+    - "{{ k8s_node_logs_path }}/kubelet"
+    - "{{ k8s_manifests_path }}"
 
 - name: Unarchive k8s-node
   unarchive:
