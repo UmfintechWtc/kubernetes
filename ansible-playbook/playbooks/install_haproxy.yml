@@ -1,0 +1,6 @@
+---
+- name: Install Haproxy
+  hosts: k8s_hosts
+  gather_facts: no
+  roles:
+    - haproxy

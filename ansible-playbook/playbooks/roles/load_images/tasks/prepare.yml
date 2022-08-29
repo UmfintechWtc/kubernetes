@@ -20,5 +20,6 @@
     - tianciwang_coredns.tar.gz
     - tianciwang_dashboard.tar.gz
     - tianciwang_metrics-scraper.tar.gz
+    - tianciwang_haproxy.tar.gz
   run_once: true
   delegate_to: "{{ groups.docker.0 }}"

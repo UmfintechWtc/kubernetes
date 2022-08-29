@@ -1,0 +1,30 @@
+---
+- name: Create haproxy config dir
+  file:
+    path: "{{ haproxy_cfg_path }}"
+    state: directory
+    mode: 0755
+
+- name: template haproxy.cfg
+  template:
+    src: haproxy.cfg.j2
+    dest: "{{ haproxy_cfg_path }}/haproxy.cfg"
+    mode: 0755
+
+- name: start haproxy
+  shell: |
+    docker run -d \
+      --name haproxy \
+      --network host \
+      --restart always \
+      -v {{ haproxy_cfg_path }}/haproxy.cfg:/etc/haproxy/haproxy.cfg \
+      {{ DockerRegistry }}/base/haproxy:{{ haproxy_repository.split(":")[1] }}
+
+- name: Check haproxy port
+  wait_for:
+    port: 18888
+    state: started
+    host: "{{ ansible_host }}"
+    delay: 5
+    timeout: 60
+    connect_timeout: 10
