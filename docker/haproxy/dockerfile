@@ -1,0 +1,23 @@
+# 操作系统基础镜像
+FROM centos:centos7.9.2009
+# 打包的人
+MAINTAINER "wangtianci"
+
+# yum基础依赖
+COPY ali-centos.repo /etc/yum.repos.d/
+COPY ali-epel.repo /etc/yum.repos.d/
+RUN yum install haproxy -y
+
+# 时间同步
+RUN rm -f /etc/localtime \
+    && ln -sv /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "Asia/Shanghai" > /etc/timezone
+
+# 设置编码
+ENV LC_ALL=zh_CN.utf8
+ENV LANG=zh_CN.utf8
+ENV LANGUAGE=zh_CN.utf8
+RUN localedef -c -f UTF-8 -i zh_CN zh_CN.utf8
+
+# 启动容器执行的命令，仅用于验证安装配置是否正确，生产环境使用需注释后再build
+ENTRYPOINT ["haproxy", "-f", "/etc/haproxy/haproxy.cfg"]
