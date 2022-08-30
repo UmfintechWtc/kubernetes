@@ -13,6 +13,8 @@
 
 - name: start haproxy
   shell: |
+    docker stop haproxy
+    docker rm haproxy
     docker run -d \
       --name haproxy \
       --network host \
