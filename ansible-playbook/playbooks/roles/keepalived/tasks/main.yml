@@ -13,12 +13,6 @@
 
 - name: start keepalived
   shell: |
-    docker run -d \
-      --name haproxy \
-      --network host \
-      --restart always \
-      -v {{ haproxy_cfg_path }}/haproxy.cfg:/etc/haproxy/haproxy.cfg \
-      {{ DockerRegistry }}/base/haproxy:{{ haproxy_repository.split(":")[1] }}
     docker run -itd \
         --privileged=true \
         --name keepalived \
