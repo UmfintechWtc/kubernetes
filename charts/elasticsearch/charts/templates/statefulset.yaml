@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "elasticsearch.name" . }}
+  labels:
+    {{- include "elasticsearch.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "elasticsearch.name" . }}
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "elasticsearch.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      labels:
+        {{- include "elasticsearch.selectorLabels" . | nindent 8 }}
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecrets }}
+      initContainers:
+        - name: modify-password
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          image: {{ .Values.image.repository }}:{{ .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+     #     command: ['/usr/bin/sleep', '200000']
+          command: ["/bin/bash","modify-password.sh"]
+          volumeMounts:
+            - name: config-scripts
+              mountPath: /opt/workspace/elasticsearch/config/elasticsearch.yml
+              subPath: elasticsearch.yml
+            - name: config-scripts
+              mountPath: /opt/workspace/elasticsearch/modify-password.sh
+              subPath: modify-password.sh
+            - name: data
+              mountPath: /opt/workspace/elasticsearch/data
+            - name: log
+              mountPath: /opt/workspace/elasticsearch/logs
+          env:
+            - name: ES_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-secret
+                  key: elasticsearch-username
+            - name: ES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-secret
+                  key: elasticsearch-password
+          resources:
+              {{- toYaml .Values.resources | nindent 12 }}
+
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.image.repository }}:{{ .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+       #   command: ["/usr/bin/sleep","100000" ]
+          ports:
+            - name: http
+              containerPort: 9200
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+              httpHeaders:
+               - name: Authorization
+                 value: Basic  {{ printf "%s:%s" .Values.elasticsearch.username  .Values.elasticsearch.password |b64enc }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+              httpHeaders:
+               - name: Authorization
+                 value: Basic  {{ printf "%s:%s" .Values.elasticsearch.username  .Values.elasticsearch.password |b64enc }}
+          volumeMounts:
+            - name: config-scripts
+              mountPath: /opt/workspace/elasticsearch/config/elasticsearch.yml
+              subPath: elasticsearch.yml
+            - name: data
+              mountPath: /opt/workspace/elasticsearch/data
+            - name: log
+              mountPath: /opt/workspace/elasticsearch/logs
+          resources:
+              {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: config-scripts
+          configMap:
+            name: {{ include "elasticsearch.name" . }}
+            items:
+              - key: elasticsearch.yml
+                path: elasticsearch.yml
+              - key: modify-password.sh 
+                path: modify-password.sh
+        - name: data
+          hostPath:
+            path: {{ .Values.elasticsearch.datadir }}
+            type: DirectoryOrCreate
+        - name: log
+          hostPath:
+            path: {{ .Values.elasticsearch.logdir }}
+            type: DirectoryOrCreate
+

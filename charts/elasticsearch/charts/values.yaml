@@ -1,0 +1,28 @@
+replicaCount: {{ service.elasticsearch.replication }}
+
+image:
+  repository: {{ harbor_url }}/elasticsearch/elasticsearch
+  pullPolicy: Always
+
+imagePullSecrets: harbor
+
+service:
+  type: NodePort
+  port: {{ service.elasticsearch.port }}
+  nodeport: {{ service.elasticsearch.port }}
+
+elasticsearch:
+  username: {{ service.elasticsearch.user }}
+  password: {{ service.elasticsearch.password }}
+  datadir: {{ starx.base }}/{{ service.elasticsearch.mount_dir_name }}/elasticsearch/data
+  logdir:  {{ starx.base }}/{{ service.elasticsearch.mount_dir_name }}/elasticsearch/logs
+
+resources:
+  requests:
+    cpu: "{{ k8s_elasticsearch.resources.requests.cpu }}"
+    memory: "{{ k8s_elasticsearch.resources.requests.memory }}"
+  limits:
+    cpu: "{{ k8s_elasticsearch.resources.limits.cpu }}"
+    memory: "{{ k8s_elasticsearch.resources.limits.memory }}"
+
+

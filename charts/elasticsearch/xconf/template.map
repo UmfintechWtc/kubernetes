@@ -1,0 +1,1 @@
+./template/elasticsearch.yaml.tpl : output/elasticsearch/elasticsearch.yml
