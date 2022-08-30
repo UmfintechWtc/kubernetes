@@ -10,3 +10,19 @@
     src: keepalived.cfg.j2
     dest: "{{ keepalived_cfg_path }}/keepalived.cfg"
     mode: 0755
+
+- name: start keepalived
+  shell: |
+    docker run -d \
+      --name haproxy \
+      --network host \
+      --restart always \
+      -v {{ haproxy_cfg_path }}/haproxy.cfg:/etc/haproxy/haproxy.cfg \
+      {{ DockerRegistry }}/base/haproxy:{{ haproxy_repository.split(":")[1] }}
+    docker run -itd \
+        --privileged=true \
+        --name keepalived \
+        --network host \
+        --restart always \
+        -v {{ haproxy_cfg_path }}/keepalived.cfg:/etc/keepalived/keepalived.cfg \
+        {{ DockerRegistry }}/base/base/keepalived:{{ keepalived_repository.split(":")[1] }}

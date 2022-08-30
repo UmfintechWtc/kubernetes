@@ -19,6 +19,7 @@ coredns_repository: tianciwang/coredns:v1.6.7
 dashboard_repository: tianciwang/dashboard:v2.1.0
 metrics_repository: tianciwang/metrics-scraper:v1.0.6
 haproxy_repository: tianciwang/haproxy:1.5.18
+keepalived_repository: tianciwang/keepalived:1.3.5
 
 # Harbor login information
 harbor_user: admin
