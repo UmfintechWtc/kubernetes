@@ -1,6 +1,8 @@
 global_defs {
 {% for server in groups['k8s_master'] %}
+{% if inventory_hostname == hostvars[server]['inventory_hostname'] %}
     router_id lb-master-{{ loop.index }}
+{% endif %}
 {% endfor %}
 }
 vrrp_script check-haproxy {
@@ -13,7 +15,9 @@ vrrp_script check-haproxy {
 vrrp_instance VI-kube-master {
     state BACKUP
 {% for server in groups['k8s_master'] %}
+{% if inventory_hostname == hostvars[server]['inventory_hostname'] %}
     priority {{ loop.index }}
+{% endif %}
 {% endfor %}
     dont_track_primary
     interface {{ keepalived_listen_port }}
