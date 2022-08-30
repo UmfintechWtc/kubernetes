@@ -13,6 +13,8 @@
 
 - name: start keepalived
   shell: |
+    docker stop keepalived
+    docker rm keepalived
     docker run -d \
         --privileged=true \
         --name keepalived \
