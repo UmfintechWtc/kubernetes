@@ -8,6 +8,7 @@
     - tianciwang_dashboard.tar.gz
     - tianciwang_metrics-scraper.tar.gz
     - tianciwang_haproxy.tar.gz
+    - tianciwang_keepalived.tar.gz
   run_once: true
   delegate_to: "{{ groups.docker.0 }}"
 
@@ -20,6 +21,7 @@
     - { name: "{{ dashboard_repository }}", project: base }
     - { name: "{{ metrics_repository }}", project: base }
     - { name: "{{ haproxy_repository }}", project: base }
+    - { name: "{{ keepalived_repository }}", project: base }
   run_once: true
   delegate_to: "{{ groups.docker.0 }}"
 
@@ -32,6 +34,7 @@
     - { name: "{{ dashboard_repository }}", project: base }
     - { name: "{{ metrics_repository }}", project: base }
     - { name: "{{ haproxy_repository }}", project: base }
+    - { name: "{{ keepalived_repository }}", project: base }
   run_once: true
   delegate_to: "{{ groups.docker.0 }}"
 
