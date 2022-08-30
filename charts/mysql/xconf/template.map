@@ -1,0 +1,1 @@
+./template/my.cnf.tpl : output/mysql/my.cnf

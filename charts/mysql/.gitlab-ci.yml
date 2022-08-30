@@ -1,0 +1,21 @@
+---
+stages:
+  - Docker_Build
+
+MySQL_Docker_Build:
+  image: $harborUrl/base/centos:$centos
+  stage: Docker_Build
+  before_script:
+    - deploy_tag=`awk -v FS=":" '$0 ~ /^appVersion/ {sub(" ", "", $2);print $2}' deploy/charts/Chart.yaml`
+  script:
+    - cd deploy/docker
+    - docker build -f dockerfile -t $harborUrl/$CI_PROJECT_NAME/$CI_PROJECT_NAME:$deploy_tag --build-arg tag=$deploy_tag --build-arg url=$harborUrl --build-arg name=$CI_PROJECT_NAME .
+    - docker push $harborUrl/$CI_PROJECT_NAME/$CI_PROJECT_NAME:$deploy_tag
+    - docker rmi $harborUrl/$CI_PROJECT_NAME/$CI_PROJECT_NAME:$deploy_tag
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+      changes:
+        - deploy/charts/Chart.yaml
+        - deploy/docker/*
+  tags:
+    - docker-runner
