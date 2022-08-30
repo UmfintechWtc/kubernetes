@@ -1,0 +1,17 @@
+environments:
+  internal-zookeeper:
+    hosts:
+      client:
+        - app1:2181
+
+  internal-es:
+    hosts:
+    - app1:9200
+    port: 9200
+    user: root
+    password: 123456
+    topic: test
+
+  internal-kafka:
+    port: 9092
+internal: {}

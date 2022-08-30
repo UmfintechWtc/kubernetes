@@ -1,0 +1,1 @@
+./template/zoo.cfg.tpl : output/zookeeper/zoo.cfg

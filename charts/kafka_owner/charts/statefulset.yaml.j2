@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ '{{ include "kafka.name" . }}' }}
+  labels:
+    {{ '{{- include "kafka.labels" . | nindent 4 }}' }}
+spec:
+  serviceName: {{ '{{ include "kafka.name" . }}' }}-svc
+  replicas: {{ '{{ .Values.replicaCount }}' }}
+  selector:
+    matchLabels:
+      {{ '{{- include "kafka.selectorLabels" . | nindent 6 }}' }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ '{{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}' }}
+      labels:
+        {{ '{{- include "kafka.selectorLabels" . | nindent 8 }}' }}
+    spec:
+      serviceAccountName: {{ '{{ include "kafka.serviceAccountName" . }}' }}
+      initContainers:
+        - name: check-zk-port
+          securityContext:
+            runAsUser: 0
+          image: harbor.in.starcross.cn/base/alpine:3.15.5
+          imagePullPolicy: Always
+          command: ["nc", "-z", "-w1","{{ ansible_host }}", "2181"]
+      containers:
+        - name: {{ '{{ include "kafka.name" . }}' }}
+          image: {{ '{{ .Values.image.repository }}:{{ .Chart.AppVersion }}' }}
+          imagePullPolicy: {{ '{{ .Values.image.pullPolicy }}' }}
+          command:
+            - bash
+            - -ec
+            - |
+                HOSTNAME=`hostname`
+                if [[ "$HOSTNAME" =~ (.*)-([0-9]+)$ ]];then
+                  only_id=${BASH_REMATCH[2]}
+                  hostname_suffix="$(( $only_id + 1 ))"
+                  sed -i "s%\$base_dir/logs%/data/kafka/logs$(( $hostname_suffix ))%g" ./bin/kafka-run-class.sh
+                else
+                  echo "Failed to get server ID from hostname $HOSTNAME"
+                fi
+                ./bin/kafka-server-start.sh ./config/kafka"$(( $only_id + 1 ))".cfg
+          livenessProbe:
+            tcpSocket:
+              port: client
+            initialDelaySeconds: {{ '{{ .Values.livenessProbe.initialDelaySeconds }}' }}
+            periodSeconds: {{ '{{ .Values.livenessProbe.periodSeconds }}' }}
+            timeoutSeconds: {{ '{{ .Values.livenessProbe.timeoutSeconds }}' }}
+            successThreshold: {{ '{{ .Values.livenessProbe.successThreshold }}' }}
+            failureThreshold: {{ '{{ .Values.livenessProbe.failureThreshold }}' }}
+          readinessProbe:
+            tcpSocket:
+              port: client
+            initialDelaySeconds: {{ '{{ .Values.readinessProbe.initialDelaySeconds }}' }}
+            periodSeconds: {{ '{{ .Values.readinessProbe.periodSeconds }}' }}
+            timeoutSeconds: {{ '{{ .Values.readinessProbe.timeoutSeconds }}' }}
+            successThreshold: {{ '{{ .Values.readinessProbe.successThreshold }}' }}
+            failureThreshold: {{ '{{ .Values.readinessProbe.failureThreshold }}' }}
+          ports:
+            - name: client
+              containerPort: 9092
+              protocol: TCP
+          resources:
+            {{ '{{- toYaml .Values.resources | nindent 12 }}' }}
+          volumeMounts:
+{%for i in range(service.kafka.replication) %}
+            - name: data{{ i | int + 1 }}
+              mountPath: /data/kafka/data{{ i | int + 1}}
+              subPath: data{{ i | int + 1}}
+            - name: logs{{ i | int + 1}}
+              mountPath: /data/kafka/logs{{ i | int + 1}}
+              subPath: logs{{ i | int + 1}}
+            - name: config{{ i | int + 1}}
+              mountPath: /opt/workspace/kafka/config/kafka{{ i | int + 1}}.cfg
+              subPath: kafka{{ i | int + 1}}.cfg
+{% endfor %}
+      volumes:
+{%for i in range(service.kafka.replication) %}
+        - name: data{{ i | int + 1 }}
+          hostPath:
+            path: {{ starx.base }}/disk{{ ((service.kafka.mount_dir_name ) | deleteStr ) + i }}Data/kafka
+            type: DirectoryOrCreate
+        - name: logs{{ i | int + 1 }}
+          hostPath:
+            path: {{ starx.base }}/disk{{ ((service.kafka.mount_dir_name ) | deleteStr ) + i }}Data/kafka
+            type: DirectoryOrCreate
+        - name: config{{ i | int + 1 }}
+          configMap:
+            name: {{ '{{ include "kafka.name" . }}' }}
+            items:
+              - key: kafka{{ i | int + 1 }}.cfg
+                path: kafka{{ i | int + 1 }}.cfg
+{% endfor %}

@@ -1,0 +1,7 @@
+environments:
+  internal-zookeeper:
+    hosts:
+      zookeeper:
+        - app1:2181
+
+internal: {}

@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "zookeeper.name" . }}
+  labels:
+    {{- include "zookeeper.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "zookeeper.name" . }}-headless
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "zookeeper.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      labels:
+        {{- include "zookeeper.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "zookeeper.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      restartPolicy: Always
+      initContainers:
+        - name: mount-dir
+          image: harbor.in.starcross.cn/base/alpine:3.15.5
+          imagePullPolicy: Always
+          securityContext:
+            runAsUser: 0
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: data
+              mountPath: /opt/app/data/zookeeper
+              subPathExpr: $(POD_NAME)
+            - name: logs
+              mountPath: /opt/app/logs/zookeeper
+              subPathExpr: $(POD_NAME)
+          command:
+            - sh
+            - -ec
+            - |
+                mkdir -pvm 755 /opt/app/data/zookeeper
+                mkdir -pvm 755 /opt/app/logs/zookeeper
+      containers:
+        - name: {{ include "zookeeper.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+          command:
+            - bash
+            - -ec
+            - |
+                HOSTNAME=`hostname`
+                if [[ "$HOSTNAME" =~ (.*)-([0-9]+)$ ]];then
+                  only_id=${BASH_REMATCH[2]}
+                  echo  "$(( $only_id + 1 ))" &> /opt/app/data/zookeeper/myid
+                else
+                  echo "Failed to get server ID from hostname $HOSTNAME"
+                fi
+                ./bin/zookeeper-server-start.sh ./config/zoo.cfg
+          ports:
+            - name: clientport
+              containerPort: 2181
+            - name: followerport
+              containerPort: 2888
+            - name: electionport
+              containerPort: 3888
+          livenessProbe:
+            exec:
+              command: ['/bin/bash', '-c', 'echo "ruok" | timeout {{ .Values.livenessProbe.probeCommandTimeout }} nc -w {{ .Values.livenessProbe.probeCommandTimeout }} localhost 2181 | grep imok']
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          readinessProbe:
+            exec:
+              command: ['/bin/bash', '-c', 'echo "ruok" | timeout {{ .Values.readinessProbe.probeCommandTimeout }} nc -w {{ .Values.readinessProbe.probeCommandTimeout }} localhost 2181 | grep imok']
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /opt/app/data/zookeeper
+              subPathExpr: $(POD_NAME)
+            - name: logs
+              mountPath: /opt/app/logs/zookeeper
+              subPathExpr: $(POD_NAME)
+            - name: config
+              mountPath: /opt/workspace/kafka/config/zoo.cfg
+              subPath: zoo.cfg
+      volumes:
+        - name: data
+          hostPath:
+            path: /starx/k8s/zookeeper/data
+            type: DirectoryOrCreate
+        - name: logs
+          hostPath:
+            path: /starx/k8s/zookeeper/logs
+            type: DirectoryOrCreate
+        - name: config
+          configMap:
+            name: {{ include "zookeeper.name" . }}
+            items:
+              - key: zoo.cfg
+                path: zoo.cfg

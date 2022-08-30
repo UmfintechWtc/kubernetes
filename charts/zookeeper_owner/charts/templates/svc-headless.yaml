@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "zookeeper.name" . }}-headless
+  labels:
+    {{- include "zookeeper.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  clusterIP: None
+  ports:
+    - name: client
+      port: 2181
+    - name: follower
+      port: 2888
+    - name: election
+      port: 3888
+  selector:
+    {{- include "zookeeper.selectorLabels" . | nindent 4 }}

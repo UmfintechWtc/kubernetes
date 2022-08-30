@@ -1,0 +1,40 @@
+replicaCount: {{ service.zookeeper.replication }}
+
+image:
+  repository: {{ harbor_url }}/zookeeper/zookeeper
+  pullPolicy: Always
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 2181
+
+resources:
+  requests:
+    cpu: "{{ k8s_zookeeper.resources.requests.cpu }}"
+    memory: "{{ k8s_zookeeper.resources.requests.memory }}"
+  limits:
+    cpu: "{{ k8s_zookeeper.resources.limits.cpu }}"
+    memory: "{{ k8s_zookeeper.resources.limits.memory }}"
+
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+  probeCommandTimeout: 2
+
+readinessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+  probeCommandTimeout: 2

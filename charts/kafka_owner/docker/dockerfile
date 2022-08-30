@@ -1,0 +1,13 @@
+ARG openjdk
+ARG harborUrl
+
+FROM ${harborUrl}/base/openjdk:${openjdk}
+
+ARG tag
+ARG name
+
+RUN mkdir /opt/workspace
+
+ADD ${name}-${tag}.tar.gz /opt/workspace/
+
+WORKDIR /opt/workspace/${name}

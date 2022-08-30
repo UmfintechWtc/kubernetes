@@ -1,0 +1,38 @@
+---
+stages:
+  - Docker_Build
+  - Push_Repo
+
+Docker_Build:
+  image: $harborUrl/base/centos:$centos
+  stage: Docker_Build
+  before_script:
+    - deploy_tag=`awk -v FS=":" '$0 ~ /^appVersion/ {sub(" ", "", $2);print $2}' deploy/charts/Chart.yaml`
+  script:
+    - cd deploy/docker
+    - mc cp minio/third-party-software/$CI_PROJECT_NAME/$CI_PROJECT_NAME-$deploy_tag.tar.gz ./
+    - docker build -f dockerfile -t $harborUrl/$CI_PROJECT_NAME/$CI_PROJECT_NAME:$deploy_tag --build-arg openjdk=$openjdk --build-arg harborUrl=$harborUrl --build-arg tag=$deploy_tag --build-arg name=$CI_PROJECT_NAME .
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+      changes:
+        - deploy/charts/Chart.yaml
+        - deploy/docker/*
+  tags:
+    - docker-runner
+
+Push_Repo:
+  image: $harborUrl/base/centos:$centos
+  before_script:
+    - deploy_tag=`awk -v FS=":" '$0 ~ /^appVersion/ {sub(" ", "", $2);print $2}' deploy/charts/Chart.yaml`
+  stage: Push_Repo
+  script:
+    - docker login ${harborUrl} -u${harborRobotUser} -p${harborRobotPassword}
+    - docker push $harborUrl/$CI_PROJECT_NAME/$CI_PROJECT_NAME:$deploy_tag
+    - docker rmi $harborUrl/$CI_PROJECT_NAME/$CI_PROJECT_NAME:$deploy_tag
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+      changes:
+        - deploy/charts/Chart.yaml
+        - deploy/docker/*
+  tags:
+    - docker-runner

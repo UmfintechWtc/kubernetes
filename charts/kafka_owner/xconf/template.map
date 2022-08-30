@@ -1,0 +1,3 @@
+./template/kafka.cfg.tpl : output/kafka/kafka.cfg
+./template/es.cfg.tpl : output/kafka/es.cfg
+./template/confluent.cfg.tpl : output/kafka/confluent.cfg
