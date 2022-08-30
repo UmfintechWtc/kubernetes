@@ -8,15 +8,15 @@
 - name: template keepalived.cfg
   template:
     src: keepalived.cfg.j2
-    dest: "{{ keepalived_cfg_path }}/keepalived.cfg"
+    dest: "{{ keepalived_cfg_path }}/keepalived.conf"
     mode: 0755
 
 - name: start keepalived
   shell: |
-    docker run -itd \
+    docker run -d \
         --privileged=true \
         --name keepalived \
         --network host \
         --restart always \
-        -v {{ keepalived_cfg_path }}/keepalived.cfg:/etc/keepalived/keepalived.cfg \
+        -v {{ keepalived_cfg_path }}/keepalived.cfg:/etc/keepalived/keepalived.conf \
         {{ DockerRegistry }}/base/keepalived:{{ keepalived_repository.split(":")[1] }}
