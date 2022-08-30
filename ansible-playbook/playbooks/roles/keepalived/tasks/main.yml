@@ -19,4 +19,4 @@
         --network host \
         --restart always \
         -v {{ keepalived_cfg_path }}/keepalived.cfg:/etc/keepalived/keepalived.cfg \
-        {{ DockerRegistry }}/base/base/keepalived:{{ keepalived_repository.split(":")[1] }}
+        {{ DockerRegistry }}/base/keepalived:{{ keepalived_repository.split(":")[1] }}
