@@ -18,5 +18,5 @@
         --name keepalived \
         --network host \
         --restart always \
-        -v {{ haproxy_cfg_path }}/keepalived.cfg:/etc/keepalived/keepalived.cfg \
+        -v {{ keepalived_cfg_path }}/keepalived.cfg:/etc/keepalived/keepalived.cfg \
         {{ DockerRegistry }}/base/base/keepalived:{{ keepalived_repository.split(":")[1] }}
