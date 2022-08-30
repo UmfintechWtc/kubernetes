@@ -9,7 +9,7 @@
   template:
     src: keepalived.conf.j2
     dest: "{{ keepalived_cfg_path }}/keepalived.conf"
-    mode: 0755
+    mode: 0644
 
 - name: start keepalived
   shell: |
