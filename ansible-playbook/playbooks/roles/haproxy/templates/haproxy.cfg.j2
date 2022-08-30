@@ -11,7 +11,7 @@ defaults
     timeout client 10m
     timeout server 10m
 listen admin_stats
-    bind 0.0.0.0:18888
+    bind 0.0.0.0:{{ haproxy_web_ui }}
     mode http
     log 127.0.0.1 local0 err
     stats refresh 30s
@@ -21,10 +21,10 @@ listen admin_stats
     stats hide-version
     stats admin if TRUE
 listen kube-master
-    bind 0.0.0.0:8443
+    bind 0.0.0.0:{{ haproxy_proxy }}
     mode tcp
     option tcplog
     balance source
 {% for host in groups.k8s_master %}
-    server {{ host }} {{ host }}:6443 check inter 2000 fall 2 rise 2 weight 1
+    server {{ host }} {{ host }}:{{ apiserver_port }} check inter 2000 fall 2 rise 2 weight 1
 {% endfor %}

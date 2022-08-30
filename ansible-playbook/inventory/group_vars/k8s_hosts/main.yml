@@ -30,10 +30,18 @@ k8s_token: 35957c1096125937d959c9edf694dbe1
 # k8s flannel network save to etcd path
 k8s_network_path: /coreos.com/network
 
-# k8s api-server port
+# k8s service port
 apiserver_port: 6443
 controller_manager_port: 10257
 scheduler_port: 10259
 kubelet_port: 10250
 kube_proxy: 10256
 dashboard_port: 33333
+
+# haproxy service port
+haproxy_web_ui: 18888
+haproxy_proxy: 8443
+
+# keepalived
+keepalived_virtual_ip: 10.2.15.254
+keepalived_listen_port: eth0
