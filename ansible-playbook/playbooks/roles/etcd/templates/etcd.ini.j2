@@ -8,29 +8,28 @@ command={{ etcd_bin_path }}/etcd
   --trusted-ca-file={{ etcd_ssl_path }}/ca.pem
   --peer-trusted-ca-file={{ etcd_ssl_path }}/ca.pem
   --log-level=debug
-  {% for server in groups['etcd'] %}
-  {% if inventory_hostname == hostvars[server]['inventory_hostname'] %}
+{% for server in groups['etcd'] %}
+{% if inventory_hostname == hostvars[server]['inventory_hostname'] %}
   --name="etcd-{{ loop.index }}"
-  {% endif %}
-  {% endfor %}
+{% endif %}
+{% endfor %}
   --data-dir="{{ etcd_data_path }}"
   --wal-dir="{{ etcd_wal_path }}"
-  {% for server in groups['etcd'] %}
-  {% if inventory_hostname == hostvars[server]['inventory_hostname'] %}
+{% for server in groups['etcd'] %}
+{% if inventory_hostname == hostvars[server]['inventory_hostname'] %}
   --listen-peer-urls="https://{{ hostvars[server]['ansible_host'] }}:2380"
   --listen-client-urls="https://{{ hostvars[server]['ansible_host'] }}:2379"
   --enable-v2=true
-  {% endif %}
-  {% endfor %}
-  #[Clustering]
+{% endif %}
+{% endfor %}
   --heartbeat-interval=100
   --election-timeout=500
-  {% for server in groups['etcd'] %}
-  {% if inventory_hostname == hostvars[server]['inventory_hostname'] %}
+{% for server in groups['etcd'] %}
+{% if inventory_hostname == hostvars[server]['inventory_hostname'] %}
   --initial-advertise-peer-urls="https://{{ hostvars[server]['ansible_host'] }}:2380"
   --advertise-client-urls="https://{{ hostvars[server]['ansible_host'] }}:2379"
-  {% endif %}
-  {% endfor %}
+{% endif %}
+{% endfor %}
   --initial-cluster="{% for host in groups['etcd'] %}etcd-{{ loop.index }}=https://{{ hostvars[host]['ansible_host'] }}:2380{% if not loop.last %},{% endif %}{% endfor %}"
   --initial-cluster-state="new"
   --initial-cluster-token="k8s-etcd-cluster"
