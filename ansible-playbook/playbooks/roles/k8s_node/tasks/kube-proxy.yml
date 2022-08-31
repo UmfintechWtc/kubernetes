@@ -17,7 +17,7 @@
   with_items:
     - { src: kube-proxy.yaml.j2, dest: "{{ k8s_node_cfg_path }}/kube-proxy.yaml" }
     - { src: create_kube_proxy.kubeconfig.sh.j2, dest: "{{ k8s_node_path }}/create_kube_proxy.kubeconfig.sh"}
-    - { src: kube-proxy.ini.j2, dest: /etc/supervisord.d/kube-proxy.ini" }
+    - { src: kube-proxy.ini.j2, dest: /etc/supervisord.d/kube-proxy.ini }
 
 - name: execute scripts
   shell: |
