@@ -24,7 +24,6 @@ command={{ k8s_master_bin_path }}/kube-apiserver
   --kubelet-certificate-authority={{ k8s_master_ssl_path }}/ca.pem
   --kubelet-client-certificate={{ k8s_master_ssl_path }}/apiserver.pem
   --kubelet-client-key={{ k8s_master_ssl_path }}/apiserver-key.pem
-  --logtostderr=true
   --proxy-client-cert-file={{ k8s_master_ssl_path }}/apiserver.pem
   --proxy-client-key-file={{ k8s_master_ssl_path }}/apiserver-key.pem
   --requestheader-client-ca-file={{ k8s_master_ssl_path }}/ca.pem

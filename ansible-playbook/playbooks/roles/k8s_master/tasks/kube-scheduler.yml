@@ -17,17 +17,16 @@
     group: "{{ app.group }}"
     mode: 0755
   with_items:
-    - { src: kube-scheduler.conf.j2, dest: "{{ k8s_master_cfg_path }}/kube-scheduler.conf"}
-    - { src: kube-scheduler.service.j2, dest: /usr/lib/systemd/system/kube-scheduler.service }
     - { src: create_kube_scheduler.kubeconfig.sh.j2, dest: "{{ k8s_master_path }}/create_kube_scheduler.kubeconfig.sh"}
+    - { src: kube-scheduler.ini.j2, dest: /etc/supervisord.d/kube-scheduler.ini}
 
 - name: execute scripts and daemon-reload
   shell: |
     cd "{{ k8s_master_path }}"
     /bin/bash ./create_kube_scheduler.kubeconfig.sh
-    systemctl daemon-reload
   notify:
-    - Restart kube-scheduler service
+    - add kube-scheduler
+    - restart kube-scheduler
 
 - meta: flush_handlers
 

@@ -17,8 +17,6 @@
     group: "{{ app.group }}"
     mode: 0755
   with_items:
-    - { src: kube-controller-manager.conf.j2, dest: "{{ k8s_master_cfg_path }}/kube-controller-manager.conf"}
-    - { src: kube-controller-manager.service.j2, dest: /usr/lib/systemd/system/kube-controller-manager.service }
     - { src: create_kube_controller_manager.kubeconfig.sh.j2, dest: "{{ k8s_master_path }}/create_kube_controller_manager.kubeconfig.sh"}
     - { src: kube-controller-manager.ini.j2, dest: /etc/supervisord.d/kube-controller-manager.ini }
 
