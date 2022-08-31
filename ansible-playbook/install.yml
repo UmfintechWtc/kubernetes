@@ -4,6 +4,8 @@
 - include: playbooks/install_docker.yml
 - include: playbooks/install_harbor.yml
 - include: playbooks/install_images.yml
+- include: playbooks/install_haproxy.yml
+- include: playbooks/install_keepalived.yml
 - include: playbooks/install_k8s_master.yml
 - include: playbooks/install_k8s_node.yml
 - include: playbooks/install_flannel.yml
