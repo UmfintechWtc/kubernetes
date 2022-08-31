@@ -1,13 +1,20 @@
-- name: Restart kubelet service
-  systemd:
+---
+- name: add kubelet
+  supervisorctl:
     name: kubelet
-    enabled: true
-    state: restarted
-    daemon_reload: yes
+    state: present
 
-- name: Restart kube-proxy service
-  systemd:
-    name: kube-proxy
-    enabled: true
+- name: restart kubelet
+  supervisorctl:
+    name: kubelet
     state: restarted
-    daemon_reload: yes
+
+- name: add kube-proxy
+  supervisorctl:
+    name: kube-proxy
+    state: present
+
+- name: restart kube-proxy
+  supervisorctl:
+    name: kube-proxy
+    state: restarted

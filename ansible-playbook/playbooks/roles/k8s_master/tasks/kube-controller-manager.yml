@@ -20,7 +20,7 @@
     - { src: create_kube_controller_manager.kubeconfig.sh.j2, dest: "{{ k8s_master_path }}/create_kube_controller_manager.kubeconfig.sh"}
     - { src: kube-controller-manager.ini.j2, dest: /etc/supervisord.d/kube-controller-manager.ini }
 
-- name: execute scripts and daemon-reload
+- name: execute scripts
   shell: |
     cd "{{ k8s_master_path }}"
     /bin/bash ./create_kube_controller_manager.kubeconfig.sh

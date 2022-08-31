@@ -19,9 +19,12 @@
     name: kube-controller-manager
     state: restarted
 
-- name: Restart kube-scheduler service
-  systemd:
+- name: add kube-scheduler
+  supervisorctl:
     name: kube-scheduler
-    enabled: true
+    state: present
+
+- name: restart kube-scheduler
+  supervisorctl:
+    name: kube-scheduler
     state: restarted
-    daemon_reload: yes

@@ -15,18 +15,17 @@
     group: "{{ app.group }}"
     mode: 0755
   with_items:
-    - { src: kube-proxy.service.j2, dest: /usr/lib/systemd/system/kube-proxy.service }
-    - { src: kube-proxy.conf.j2, dest: "{{ k8s_node_cfg_path }}/kube-proxy.conf" }
     - { src: kube-proxy.yaml.j2, dest: "{{ k8s_node_cfg_path }}/kube-proxy.yaml" }
     - { src: create_kube_proxy.kubeconfig.sh.j2, dest: "{{ k8s_node_path }}/create_kube_proxy.kubeconfig.sh"}
+    - { src: kube-proxy.ini.j2, dest: /etc/supervisord.d/kube-proxy.ini" }
 
-- name: execute scripts and daemon-reload
+- name: execute scripts
   shell: |
     cd "{{ k8s_node_path }}"
     /bin/bash ./create_kube_proxy.kubeconfig.sh
-    systemctl daemon-reload
   notify:
-    - Restart kube-proxy service
+    - add kube-proxy
+    - restart kube-proxy
 
 - meta: flush_handlers
 

@@ -27,14 +27,13 @@
     mode: 0755
   with_items:
     - { src: create_kubelet.sh.j2, dest: "{{ k8s_node_path }}/create_kubelet.sh" }
-    - { src: kubelet.service.j2, dest: /usr/lib/systemd/system/kubelet.service }
     - { src: kubelet.yaml.j2, dest: "{{ k8s_node_cfg_path }}/kubelet.yaml" }
-    - { src: kubelet.conf.j2, dest: "{{ k8s_node_cfg_path }}/kubelet.conf" }
+    - { src: kubelet.ini.j2, dest: /etc/supervisord.d/kubelet.ini }
 
 - name: execute scripts and daemon-reload
   shell: |
     cd "{{ k8s_node_path }}"
     /bin/bash ./create_kubelet.sh
-    systemctl daemon-reload
   notify:
-    - Restart kubelet service
+    - add kubelet
+    - restart kubelet
