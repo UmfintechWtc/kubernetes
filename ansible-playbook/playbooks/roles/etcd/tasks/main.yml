@@ -10,7 +10,6 @@
     - "{{ etcd_data_path }}"
     - "{{ etcd_wal_path }}"
     - "{{ etcd_ssl_path }}"
-    - "{{ etcd_cfg_path }}"
     - "{{ etcd_bin_path }}"
     - "{{ etcd_logs_path }}"
 
