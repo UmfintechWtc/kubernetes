@@ -26,9 +26,9 @@
   shell: |
     cd "{{ k8s_master_path }}"
     /bin/bash ./create_kube_controller_manager.kubeconfig.sh
-    systemctl daemon-reload
   notify:
-    - Restart kube-controller-manager service
+    - add kube-controller-manager
+    - restart kube-controller-manager
 
 - meta: flush_handlers
 
