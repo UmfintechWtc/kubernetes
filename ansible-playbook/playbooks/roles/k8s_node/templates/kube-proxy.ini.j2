@@ -1,4 +1,4 @@
-[program:kubelet]
+[program:kube-proxy]
 process_name = %(program_name)s
 command={{ k8s_node_bin_path }}/kube-proxy
   --logtostderr=false

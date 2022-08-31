@@ -33,6 +33,8 @@
 - name: Check k8s cluster status
   shell: |
     kubectl get nodes
+    kubectl get lease -n kube-system kube-controller-manager
+    kubectl get lease -n kube-system kube-scheduler
   register: result
 
 - debug:

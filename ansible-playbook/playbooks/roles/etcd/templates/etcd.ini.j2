@@ -7,7 +7,7 @@ command={{ etcd_bin_path }}/etcd
   --peer-key-file={{ etcd_ssl_path }}/etcd-key.pem
   --trusted-ca-file={{ etcd_ssl_path }}/ca.pem
   --peer-trusted-ca-file={{ etcd_ssl_path }}/ca.pem
-  --log-level=debug
+  --log-level=info
 {% for server in groups['etcd'] %}
 {% if inventory_hostname == hostvars[server]['inventory_hostname'] %}
   --name="etcd-{{ loop.index }}"
