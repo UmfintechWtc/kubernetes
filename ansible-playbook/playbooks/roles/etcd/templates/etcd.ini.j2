@@ -7,35 +7,34 @@ command={{ etcd_bin_path }}/etcd
   --peer-key-file={{ etcd_ssl_path }}/etcd-key.pem
   --trusted-ca-file={{ etcd_ssl_path }}/ca.pem
   --peer-trusted-ca-file={{ etcd_ssl_path }}/ca.pem
-  --logger=zap
-  #[Member]
+  --log-level=debug
   {% for server in groups['etcd'] %}
   {% if inventory_hostname == hostvars[server]['inventory_hostname'] %}
-  ETCD_NAME="etcd-{{ loop.index }}"
+  --name="etcd-{{ loop.index }}"
   {% endif %}
   {% endfor %}
-  ETCD_DATA_DIR="{{ etcd_data_path }}"
-  ETCD_WAL_DIR="{{ etcd_wal_path }}"
+  --data-dir="{{ etcd_data_path }}"
+  --wal-dir="{{ etcd_wal_path }}"
   {% for server in groups['etcd'] %}
   {% if inventory_hostname == hostvars[server]['inventory_hostname'] %}
-  ETCD_LISTEN_PEER_URLS="https://{{ hostvars[server]['ansible_host'] }}:2380"
-  ETCD_LISTEN_CLIENT_URLS="https://{{ hostvars[server]['ansible_host'] }}:2379"
-  ETCD_ENABLE_V2=true
+  --listen-peer-urls="https://{{ hostvars[server]['ansible_host'] }}:2380"
+  --listen-client-urls="https://{{ hostvars[server]['ansible_host'] }}:2379"
+  --enable-v2=true
   {% endif %}
   {% endfor %}
   #[Clustering]
-  ETCD_HEARTBEAT_INTERVAL=100
-  ETCD_ELECTION_TIMEOUT=500
+  --heartbeat-interval=100
+  --election-timeout=500
   {% for server in groups['etcd'] %}
   {% if inventory_hostname == hostvars[server]['inventory_hostname'] %}
-  ETCD_INITIAL_ADVERTISE_PEER_URLS="https://{{ hostvars[server]['ansible_host'] }}:2380"
-  ETCD_ADVERTISE_CLIENT_URLS="https://{{ hostvars[server]['ansible_host'] }}:2379"
+  --initial-advertise-peer-urls="https://{{ hostvars[server]['ansible_host'] }}:2380"
+  --advertise-client-urls="https://{{ hostvars[server]['ansible_host'] }}:2379"
   {% endif %}
   {% endfor %}
-  ETCD_INITIAL_CLUSTER="{% for host in groups['etcd'] %}etcd-{{ loop.index }}=https://{{ hostvars[host]['ansible_host'] }}:2380{% if not loop.last %},{% endif %}{% endfor %}"
-  ETCD_INITIAL_CLUSTER_STATE="new"
-  ETCD_INITIAL_CLUSTER_TOKEN="k8s-etcd-cluster"
-  ETCD_CLIENT_CERT_AUTH
+  --initial-cluster="{% for host in groups['etcd'] %}etcd-{{ loop.index }}=https://{{ hostvars[host]['ansible_host'] }}:2380{% if not loop.last %},{% endif %}{% endfor %}"
+  --initial-cluster-state="new"
+  --initial-cluster-token="k8s-etcd-cluster"
+  --peer-client-cert-auth=true
 directory={{ etcd_home }}
 user= {{ app.user }}
 startsecs=3
@@ -44,9 +43,6 @@ autorestart = true
 stopwaitsecs = 360
 stopsignal = KILL
 stopasgroup = true
-stdout_logfile = {{ etcd_logs_path }}/%(program_name)s-stdout.log
+stdout_logfile = {{ etcd_logs_path }}/%(program_name)s.log
 stdout_logfile_maxbytes=100MB
-stdout_logfile_backups=1
-stderr_logfile = {{ etcd_logs_path }}/%(program_name)s-stderr.log
-stderr_logfile_maxbytes=100MB
-stderr_logfile_backups=1
+stdout_logfile_backups=5

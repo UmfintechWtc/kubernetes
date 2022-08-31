@@ -61,8 +61,6 @@
     group: "{{ app.group }}"
     mode: 0755
   with_items:
-    - { src: etcd.conf.j2, dest: "{{ etcd_cfg_path }}/etcd.conf" }
-    - { src: etcd.service.j2, dest: /usr/lib/systemd/system/etcd.service }
     - { src: check_etcd_cluster.sh.j2, dest: "{{ etcd_home }}/check_etcd_cluster.sh" }
     - { src: etcd.ini.j2, dest: /etc/supervisord.d/etcd.ini }
   notify:
