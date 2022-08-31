@@ -24,8 +24,6 @@
     owner: "{{ app.user }}"
     group: "{{ app.group }}"
   with_items:
-    - { src: kube-apiserver.conf.j2, dest: "{{ k8s_master_cfg_path }}/kube-apiserver.conf" }
-    - { src: kube-apiserver.service.j2, dest: /usr/lib/systemd/system/kube-apiserver.service }
     - { src: kube-apiserver.ini.j2, dest: /etc/supervisord.d/kube-apiserver.ini }
   notify:
     - add kube-apiserver

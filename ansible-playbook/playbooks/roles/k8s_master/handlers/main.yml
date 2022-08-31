@@ -1,7 +1,7 @@
 ---
 - name: add kube-apiserver
   supervisorctl:
-    name:kube-apiserver
+    name: kube-apiserver
     state: present
 
 - name: restart kube-apiserver
@@ -9,12 +9,15 @@
     name: kube-apiserver
     state: restarted
 
-- name: Restart kube-controller-manager service
-  systemd:
+- name: add kube-controller-manager
+  supervisorctl:
     name: kube-controller-manager
-    enabled: true
+    state: present
+
+- name: restart kube-controller-manager
+  supervisorctl:
+    name: kube-controller-manager
     state: restarted
-    daemon_reload: yes
 
 - name: Restart kube-scheduler service
   systemd:
