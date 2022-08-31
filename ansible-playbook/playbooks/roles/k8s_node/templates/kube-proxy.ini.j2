@@ -3,7 +3,6 @@ process_name = %(program_name)s
 command={{ k8s_node_bin_path }}/kube-proxy
   --logtostderr=false
   --config={{ k8s_node_cfg_path }}/kube-proxy.yaml
-  --log-file={{ k8s_node_logs_path }}/kube-proxy/kube-proxy.log
   --v=2
 directory={{ k8s_node_path }}
 user= {{ app.user }}
