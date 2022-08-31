@@ -26,11 +26,10 @@
   with_items:
     - { src: kube-apiserver.conf.j2, dest: "{{ k8s_master_cfg_path }}/kube-apiserver.conf" }
     - { src: kube-apiserver.service.j2, dest: /usr/lib/systemd/system/kube-apiserver.service }
-
-- name: kube-apiserver daemon-reload
-  shell: systemctl daemon-reload
+    - { src: kube-apiserver.ini.j2, dest: /etc/supervisord.d/kube-apiserver }
   notify:
-    - Restart kube-apiserver service
+    - add kube-apiserver
+    - restart kube-apiserver
 
 - meta: flush_handlers
 
