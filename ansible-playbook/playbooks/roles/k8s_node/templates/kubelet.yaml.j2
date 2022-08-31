@@ -42,4 +42,4 @@ evictionHard:
   imagefs.available: "15%"
 containerLogMaxSize: 10Mi
 containerLogMaxFiles: 8
-staticPodPath: /etc/kubernetes/manifests
+staticPodPath: {{ k8s_manifests_path }}

@@ -31,6 +31,9 @@ k8s_token: 35957c1096125937d959c9edf694dbe1
 # k8s flannel network save to etcd path
 k8s_network_path: /coreos.com/network
 
+# k8s taint policy, default: NoExecute (NoSchedule | PreferNoSchedule | NoExecute)
+k8s_master_taint: NoExecute
+
 # k8s service port
 apiserver_port: 6443
 controller_manager_port: 10257

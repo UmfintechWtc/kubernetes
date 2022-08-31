@@ -9,6 +9,7 @@
 - name: k8s master add label
   shell: |
     kubectl label node {{ hostvars[host]['ansible_host'] }} node-role.kubernetes.io/master=master
+    kubectl taint nodes {{ hostvars[host]['ansible_host'] }} node-role.kubernetes.io/master:{{ k8s_master_taint }}
   with_items:
     - "{{ groups['k8s_master'] }}"
   loop_control:
