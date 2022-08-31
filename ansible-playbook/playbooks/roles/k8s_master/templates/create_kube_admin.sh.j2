@@ -2,7 +2,7 @@
 
 mkdir $HOME/.kube
 KUBE_CONFIG="$HOME/.kube/config"
-KUBE_APISERVER="https://{{ hostvars[groups['k8s_master'][0]]['ansible_host'] }}:6443"
+KUBE_APISERVER="https://{{ keepalived_virtual_ip }}:{{ haproxy_proxy }}"
 
 {{ k8s_master_bin_path }}/kubectl config set-cluster kubernetes \
   --embed-certs=true \

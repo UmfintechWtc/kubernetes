@@ -6,6 +6,7 @@
     },
     "hosts": [
         "127.0.0.1",
+        "{{ keepalived_virtual_ip }}",
 {% for host in groups['k8s_master'] %}
 {% if not loop.last %}
         "{{ hostvars[host]['ansible_host'] }}",
