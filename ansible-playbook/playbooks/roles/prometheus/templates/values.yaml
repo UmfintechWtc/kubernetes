@@ -12,7 +12,7 @@ service:
   type: ClusterIP
 {% endif %}
   port: {{ service.prometheus.port }}
-  logPath: {{ service.prometheus.containerPath }}/{{ role_name }}/log
+  logPath: {{ service.containerPath }}/{{ role_name }}/log
   extraArgs:
     storage.tsdb.retention.time: {{ service.prometheus.dbRetention }}
     storage.tsdb.path: {{ service.containerPath }}/{{ role_name }}/data
