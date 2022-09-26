@@ -13,4 +13,4 @@ scrape_configs:
     - source_labels:
       - __meta_kubernetes_pod_name
       action: keep
-      regex: node-exporter
+      regex: node-exporter-(.+)
