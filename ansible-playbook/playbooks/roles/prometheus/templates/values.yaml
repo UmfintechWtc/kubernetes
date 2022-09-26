@@ -15,7 +15,7 @@ service:
   logPath: {{ service.prometheus.containerPath }}/{{ role_name }}/log
   extraArgs:
     storage.tsdb.retention.time: {{ service.prometheus.dbRetention }}
-    storage.tsdb.path: {{ service.prometheus.containerPath }}/{{ role_name }}/data
+    storage.tsdb.path: {{ service.containerPath }}/{{ role_name }}/data
     config.file: /etc/prometheus.yml
     web.enable-lifecycle:
     web.enable-admin-api:
