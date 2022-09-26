@@ -16,8 +16,8 @@
 #YUM_FILE=./playbooks/files/third-party-software/centos7-$yum_version.tar.gz
 #PIP_FILE=./playbooks/files/third-party-software/pypi-$pypi_version.tar.gz
 #GHFS_FILE=./playbooks/files/third-party-software/ghfs-1.0.0.tar.gz
-#PIP_REPO_FILE=~/.pip/pip.conf
-#YUM_REPO_FILE=/etc/yum.repos.d/local.repo
+PIP_REPO_FILE=~/.pip/pip.conf
+YUM_REPO_FILE=/etc/yum.repos.d/local.repo
 #LOCAL_IP=`hostname -I | awk '{print $1}'`
 #ANSIBLE_FORKS=$(lscpu | grep "^CPU(s):" | awk '{print $2}')
 #tar -xf $GHFS_FILE -C /usr/local/bin/
