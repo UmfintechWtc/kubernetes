@@ -75,7 +75,7 @@ EOF
     cat > $YUM_REPO_FILE << EOF
 [tsinghua]
 name=tsinghua
-baseurl=https://mirrors.tuna.tsinghua.edu.cn/centos/7/os/x86_64/Packages/
+baseurl=https://mirrors.tuna.tsinghua.edu.cn/centos/7/os/x86_64/
 enabled=1
 gpgcheck=0
 EOF
