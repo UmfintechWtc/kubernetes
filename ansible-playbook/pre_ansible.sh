@@ -78,6 +78,11 @@ name=tsinghua
 baseurl=https://mirrors.tuna.tsinghua.edu.cn/centos/7/os/x86_64/
 enabled=1
 gpgcheck=0
+[epel]
+name=epel
+baseurl=https://mirrors.tuna.tsinghua.edu.cn/epel/7Server/x86_64/
+enabled=1
+gpgcheck=0
 EOF
 
     # repo init

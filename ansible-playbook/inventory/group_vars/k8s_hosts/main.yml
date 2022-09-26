@@ -49,3 +49,9 @@ haproxy_proxy: 8443
 # keepalived
 keepalived_virtual_ip: 10.2.15.254
 keepalived_listen_port: eth0
+
+# use python verison
+python_interpreter: /usr/bin/python3
+
+# k8s global namespace name
+namespace: tianciwang
