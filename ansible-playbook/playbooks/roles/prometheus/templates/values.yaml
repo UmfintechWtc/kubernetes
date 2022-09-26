@@ -53,3 +53,6 @@ resources:
    requests:
      cpu: {{ service.prometheus.requests.cpu }}
      memory: {{ service.prometheus.requests.memory }}
+
+serviceAccount:
+ create: true
