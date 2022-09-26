@@ -7,10 +7,10 @@ service:
     port: 39090
     nodePort: True
     limits:
-      cpu: 1024Mi
+      cpu: 1024
       memory: 1024Mi
     requests:
-      cpu: 2048Mi
+      cpu: 2048
       memory: 2048Mi
     checkHealthy: true
     dbRetention: 15d
