@@ -1,0 +1,55 @@
+replicaCount: {{ service.prometheus.replication }}
+
+image:
+  repository: {{ DockerRegistry }}/{{ role_name }}/{{ role_name }}
+  pullPolicy: {{ service.prometheus.pullPolicy }}
+  tag: "{{ service.prometheus.tag }}"
+
+service:
+{% if service.prometheus.nodePort %}
+  type: NodePort
+{% else %}
+  type: ClusterIP
+{% endif %}
+  port: {{ service.prometheus.port }}
+  logPath: {{ service.prometheus.containerPath }}/{{ role_name }}/log
+  extraArgs:
+    storage.tsdb.retention.time: {{ service.prometheus.dbRetention }}
+    storage.tsdb.path: {{ service.prometheus.containerPath }}/{{ role_name }}/data
+    config.file: /etc/prometheus.yml
+    web.enable-lifecycle:
+    web.enable-admin-api:
+
+livenessProbe:
+{% if service.prometheus.checkHealthy %}
+  enabled: true
+{% else %}
+  enabled: false
+{% endif %}
+  path: /-/healthy
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 120
+  successThreshold: 1
+
+readinessProbe:
+{% if service.prometheus.checkHealthy %}
+  enabled: true
+{% else %}
+  enabled: false
+{% endif %}
+  path: /-/ready
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 120
+  successThreshold: 1
+
+resources:
+   limits:
+     cpu: {{ service.prometheus.limits.cpu }}
+     memory: {{ service.prometheus.limits.memory }}
+   requests:
+     cpu: {{ service.prometheus.requests.cpu }}
+     memory: {{ service.prometheus.requests.memory }}

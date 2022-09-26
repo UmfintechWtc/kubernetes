@@ -1,6 +1,11 @@
 ---
 - name: Deploy latest version of  {{ role_name }}  chart inside starx namespace (and create it)
   block:
+    - name: template prometheus values.yaml
+      template:
+        src: values.yaml
+        dest: "{{ role_path }}/files/deploy/charts"
+
     - name: delete {{ role_name }} release if exists
       kubernetes.core.helm:
         name: "{{ role_name }}"
@@ -24,6 +29,6 @@
       assert:
         that:
           - 200 <= 100
-        msg: u'[E-60000] helm启动prometheus服务失败!'
+        msg: u'[E-1000] helm启动prometheus服务失败!'
 
 
