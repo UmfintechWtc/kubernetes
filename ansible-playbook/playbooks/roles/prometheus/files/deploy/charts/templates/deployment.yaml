@@ -57,9 +57,9 @@ spec:
             {{- end }}
           volumeMounts:
             - name: datadir
-              mountPath: {{ service.logPath }}/{{ role_name }}/data
+              mountPath: {{ service.basePath }}/{{ role_name }}/data
             - name: logdir
-              mountPath: {{ service.logPath }}/{{ role_name }}/log
+              mountPath: {{ service.basePath }}/{{ role_name }}/log
             - name: config
               mountPath: /etc/prometheus.yml
               subPath: prometheus.yml
@@ -68,11 +68,11 @@ spec:
       volumes:
         - name: datadir
           hostPath:
-            path: {{ service.logPath }}/{{ role_name }}/data
+            path: {{ service.basePath }}/{{ role_name }}/data
             type: DirectoryOrCreate
         - name: logdir
           hostPath:
-            path: {{ service.logPath }}/{{ role_name }}/logs
+            path: {{ service.basePath }}/{{ role_name }}/logs
             type: DirectoryOrCreate
         - name: config
           configMap:
