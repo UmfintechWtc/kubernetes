@@ -1,0 +1,37 @@
+image:
+ repository: harbor.in.starcross.cn/node-exporter/node-exporter
+ pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 9100
+  extraArgs:
+    path.procfs: /host/proc
+    path.sysfs: /host/sys
+    path.rootfs: /host/root
+    collector.filesystem.ignored-mount-points: "^/(dev|proc|sys|host|etc|var/lib/docker/.+)($|/)"
+  hostNetwork: true
+  hostPID: true
+  hostIPC: true
+
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+
+readinessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+
+resources:
+ requests:
+   cpu: "0.5"
+   memory: "1024Mi"
+ limits:
+   cpu: "0.5"
+   memory: "1024Mi"

@@ -1,7 +1,7 @@
 replicaCount: {{ service.prometheus.replication }}
 
 image:
-  repository: {{ DockerRegistry }}/{{ role_name }}/{{ role_name }}
+  repository: {{ DockerRegistry }}/base/{{ role_name }}
   pullPolicy: {{ service.prometheus.pullPolicy }}
   tag: "{{ service.prometheus.tag }}"
 
