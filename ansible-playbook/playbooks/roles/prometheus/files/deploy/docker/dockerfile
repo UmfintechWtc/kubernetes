@@ -7,4 +7,6 @@ RUN rm -f /etc/localtime \
 
 ADD prometheus-2.28.1.tar.gz /opt/workspace
 
+WORKDIR /opt/workspace/prometheus
+
 ENTRYPOINT ["./prometheus"]

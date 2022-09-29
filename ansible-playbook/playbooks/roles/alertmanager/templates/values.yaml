@@ -1,0 +1,53 @@
+replicaCount: {{ service.alertmanager.replication }}
+image:
+  repository: {{ DockerRegistry }}/base/{{ role_name }}
+  pullPolicy: {{ service.alertmanager.pullPolicy }}
+  tag: "{{ service.alertmanager.tag }}"
+
+service:
+{% if service.alertmanager.nodePort %}
+  type: NodePort
+{% else %}
+  type: ClusterIP
+{% endif %}
+  port: {{ service.alertmanager.port }}
+  basePath: {{ service.containerPath }}/{{ role_name }}
+  extraArgs:
+    data.retention: {{ service.alertmanager.dataRetention }}
+    storage.path: {{ service.containerPath }}/{{ role_name }}/data
+    config.file: /etc/alertmanager.yml
+
+livenessProbe:
+{% if service.alertmanager.checkHealthy %}
+  enabled: true
+{% else %}
+  enabled: false
+{% endif %}
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 120
+  successThreshold: 1
+
+readinessProbe:
+{% if service.alertmanager.checkHealthy %}
+  enabled: true
+{% else %}
+  enabled: false
+{% endif %}
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 120
+  successThreshold: 1
+
+resources:
+   limits:
+     cpu: {{ service.alertmanager.limits.cpu }}
+     memory: {{ service.alertmanager.limits.memory }}
+   requests:
+     cpu: {{ service.alertmanager.requests.cpu }}
+     memory: {{ service.alertmanager.requests.memory }}
+
+serviceAccount:
+ create: true

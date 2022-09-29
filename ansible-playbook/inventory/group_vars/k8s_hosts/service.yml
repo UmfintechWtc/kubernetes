@@ -14,3 +14,17 @@ service:
       memory: "2048Mi"
     checkHealthy: true
     dbRetention: 15d
+  alertmanager:
+    replication: 1
+    pullPolicy: Always
+    tag: 0.23.0
+    prot: 39093
+    nodePort: False
+    requests:
+      cpu: "1024"
+      memory: "1024Mi"
+    limits:
+      cpu: "2048"
+      memory: "2048Mi"
+    checkHealthy: true
+    dataRetention: 168h
