@@ -6,6 +6,11 @@
         src: values.yaml
         dest: "{{ role_path }}/files/deploy/charts"
 
+    - name: template {{ role_name }} alertmanager.yml
+      template:
+        src: alertmanager.yml
+        dest: "{{ role_path }}/files/deploy/charts/config"
+
     - name: delete {{ role_name }} release if exists
       kubernetes.core.helm:
         name: "{{ role_name }}"

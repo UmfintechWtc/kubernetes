@@ -56,7 +56,7 @@ spec:
               mountPath: /etc/alertmanager.yml
               subPath: alertmanager.yml
             - name: alert-template
-              mountPath: {{ .Values.servie.basePath }}/templates/wechat.tmpl
+              mountPath: {{ .Values.service.basePath }}/templates/wechat.tmpl
               subPath: wechat.tmpl
       volumes:
         - name: datadir
