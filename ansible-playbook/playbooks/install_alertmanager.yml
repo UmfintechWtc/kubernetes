@@ -1,0 +1,5 @@
+- name: Install alertmanager
+  hosts: k8s_master[0]
+  gather_facts: no
+  roles:
+    - alertmanager

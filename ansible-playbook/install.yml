@@ -13,4 +13,5 @@
 - include: playbooks/install_helm.yml
 - include: playbooks/install_dashboard.yml
 - include: playbooks/install_node-exporter.yml
+- include: playbooks/install_alertmanager.yml
 - include: playbooks/install_prometheus.yml

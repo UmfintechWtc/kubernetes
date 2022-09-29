@@ -28,3 +28,4 @@ service:
       memory: "2048Mi"
     checkHealthy: true
     dataRetention: 168h
+    sendResolved: true

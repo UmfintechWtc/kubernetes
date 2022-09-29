@@ -1,0 +1,24 @@
+{{ define "wechat.default.message" }}
+{{- if gt (len .Alerts.Firing) 0 -}}
+{{ range .Alerts }}
+**********告警通知**********
+告警主题：{{ .Annotations.summary }}
+告警等级：{{ .Labels.serverity }}
+告警类型：{{ .Labels.alertname }}
+告警内容：{{ .Annotations.description }}
+故障时间：{{ (.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05" }}
+{{- end }}
+{{- end }}
+
+{{- if gt (len .Alerts.Resolved) 0 -}}
+{{ range .Alerts }}
+**********恢复通知**********
+告警主题：{{ .Annotations.summary }}
+告警等级：{{ .Labels.serverity }}
+告警类型：{{ .Labels.alertname }}
+告警内容：{{ .Annotations.description }}
+故障时间：{{ (.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05" }}
+恢复时间：{{ (.EndsAt.Add 28800e9).Format "2006-01-02 15:04:05" }}
+{{- end }}
+{{- end }}
+{{- end }}
