@@ -82,12 +82,12 @@ spec:
         - name: config
           configMap:
             name: {{ include "prometheus.name" . }}
-            item:
+            items:
               - key: prometheus.yml
                 path: prometheus.yml
         - name: rule
           configMap:
             name: {{ include "prometheus.name" . }}
-            item:
+            items:
               - key: rule.yml
                 path: rule.yml
