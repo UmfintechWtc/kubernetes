@@ -67,9 +67,6 @@ spec:
           hostPath:
             path: {{ .Values.service.basePath }}/logs
             type: DirectoryOrCreate
-        - name: alert-template
-          hostPath:
-            path:
         - name: config
           configMap:
             name: {{ include "alertmanager.name" . }}
