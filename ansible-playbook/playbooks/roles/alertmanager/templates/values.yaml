@@ -16,6 +16,7 @@ service:
     data.retention: {{ service.alertmanager.dataRetention }}
     storage.path: {{ service.containerPath }}/{{ role_name }}/data
     config.file: /etc/alertmanager.yml
+    web.listen-addres: ::{{ service.alertmanager.port }}
 
 livenessProbe:
 {% if service.alertmanager.checkHealthy %}
