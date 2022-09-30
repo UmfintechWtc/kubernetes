@@ -9,7 +9,7 @@ groups:
       serverity: 非常严重
     annotations:
       summary: "内存告警"
-      description: "{{ $labels.host_machine }} 可用内存 {{$value | printf "%.2f" }}% < 20%"
+      description: "{{ $labels.host_machine }} 可用内存 {{$value | printf \"%.2f\" }}% < 20%"
 
   - alert: instance_load5
     expr: node_load5 > 30
@@ -19,4 +19,4 @@ groups:
       serverity: 非常严重
     annotations:
       summary: "服务器负载告警"
-      description: "{{ $labels.host_machine }} 服务器近5min负载为{{$value | printf "%.2f" }}%"
+      description: "{{ $labels.host_machine }} 服务器近1min负载为{{$value | printf \"%.2f\" }}%,已超过30%"
