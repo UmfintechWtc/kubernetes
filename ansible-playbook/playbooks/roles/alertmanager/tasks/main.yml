@@ -24,7 +24,7 @@
         release_namespace: "{{ namespace }}"
         create_namespace: true
         wait: true
-        wait_timeout: 180s
+        wait_timeout: 60s
         force: true
   vars:
     ansible_python_interpreter: "{{ python_interpreter }}"
