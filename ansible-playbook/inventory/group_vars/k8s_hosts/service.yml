@@ -7,11 +7,11 @@ service:
     port: 39090
     nodePort: True
     requests:
-      cpu: "1024"
+      cpu: "100m"
       memory: "1024Mi"
     limits:
-      cpu: "2048"
-      memory: "2048Mi"
+      cpu: "100m"
+      memory: "1024Mi"
     checkHealthy: true
     dbRetention: 15d
   alertmanager:
@@ -21,11 +21,11 @@ service:
     port: 39093
     nodePort: False
     requests:
-      cpu: "1024"
+      cpu: "100m"
       memory: "1024Mi"
     limits:
-      cpu: "2048"
-      memory: "2048Mi"
+      cpu: "100m"
+      memory: "1024Mi"
     checkHealthy: true
     dataRetention: 168h
     sendResolved: true
