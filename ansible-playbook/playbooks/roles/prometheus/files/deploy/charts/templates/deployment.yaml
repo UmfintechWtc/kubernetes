@@ -65,6 +65,9 @@ spec:
             - name: config
               mountPath: /etc/prometheus.yml
               subPath: prometheus.yml
+            - name: rule
+              mountPath: /etc/rule.yml
+              subPath: rule.yml
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
@@ -79,3 +82,12 @@ spec:
         - name: config
           configMap:
             name: {{ include "prometheus.name" . }}
+            item:
+              - key: prometheus.yml
+                path: prometheus.yml
+        - name: rule
+          configMap:
+            name: {{ include "prometheus.name" . }}
+            item:
+              - key: rule.yml
+                path: rule.yml
