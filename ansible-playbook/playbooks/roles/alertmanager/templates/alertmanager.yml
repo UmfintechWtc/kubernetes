@@ -10,13 +10,32 @@ route:
   group_interval: 1m
   repeat_interval: 1m
   receiver: wechat
-
+  routers:
+    - receiver: "ops-team1"
+      group_wait: 1s
+      group_interval: 1s
+      repeat_interval: 1m
+      match_re:
+        serverity: 紧急
+    - receiver: "ops-team2"
+      match_re:
+        serverity: 轻微
 receivers:
   - name: 'wechat'
-    wechat_configs:
-    - corp_id: '{{ wechat_corp_id }}'
-      agent_id: '{{ wechat_agent_id }}'
-      api_secret: '{{ wechat_api_secret }}'
-      to_user: '{{ wechat_to_user }},{{ wechat_to_tag }},{{ wechat_to_party }}'
-      api_url: 'http://39.105.101.140:9000/alarm'
+    webhook_configs:
+    - url: 'http://39.105.101.140:9000/alarm'
       send_resolved: {{ service.alertmanager.sendResolved }}
+  - name: 'ops-team1'
+    wechat_configs:
+    - corp_id: 'wwc4cb679fd7911d16'
+      agent_id: '1000003'
+      api_secret: 'KelmEuYhOLE0nhCWUwOuz_EXux9WYTj0gtQhRdjNu1o'
+      to_user: 'TianCiwang'
+      send_resolved: {{ service.alertmanager.sendResolved }}
+  - name: 'ops-team2'
+    wechat_configs:
+      - corp_id: 'wwc4cb679fd7911d16'
+        agent_id: '1000004'
+        api_secret: '8rBPN8KO_3hjNiVeXJ157VRb0Xd7ReEQNDiTSccRRWE'
+        to_user: 'TianCiwang'
+        send_resolved: { { service.alertmanager.sendResolved } }
