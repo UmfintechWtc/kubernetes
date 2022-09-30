@@ -17,5 +17,6 @@ receivers:
     - corp_id: '{{ wechat_corp_id }}'
       agent_id: '{{ wechat_agent_id }}'
       api_secret: '{{ wechat_api_secret }}'
-      to_user: '{{ wechat_to_user }},{{ wechat_to_tag }},{{ wechat_to_user }}'
+      to_user: '{{ wechat_to_user }},{{ wechat_to_tag }},{{ wechat_to_party }}'
+      api_url: 'http://39.105.101.140:9000/alarm'
       send_resolved: {{ service.alertmanager.sendResolved }}
