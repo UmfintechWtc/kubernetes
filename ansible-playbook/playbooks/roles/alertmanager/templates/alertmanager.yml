@@ -10,7 +10,7 @@ route:
   group_interval: 1m
   repeat_interval: 1m
   receiver: wechat
-  routers:
+  routes:
     - receiver: "ops-team1"
       group_wait: 1s
       group_interval: 1s
@@ -34,8 +34,8 @@ receivers:
       send_resolved: {{ service.alertmanager.sendResolved }}
   - name: 'ops-team2'
     wechat_configs:
-      - corp_id: 'wwc4cb679fd7911d16'
-        agent_id: '1000004'
-        api_secret: '8rBPN8KO_3hjNiVeXJ157VRb0Xd7ReEQNDiTSccRRWE'
-        to_user: 'TianCiwang'
-        send_resolved: { { service.alertmanager.sendResolved } }
+    - corp_id: 'wwc4cb679fd7911d16'
+      agent_id: '1000004'
+      api_secret: '8rBPN8KO_3hjNiVeXJ157VRb0Xd7ReEQNDiTSccRRWE'
+      to_user: 'TianCiwang'
+      send_resolved: {{ service.alertmanager.sendResolved }}
