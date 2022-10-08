@@ -15,9 +15,18 @@
     group: "{{ app.group }}"
     mode: 0755
 
+- name: Tempalte metrics-server yml
+  template:
+    src: metrics-server.yml.j2
+    dest: "{{ app.home }}/dashboard/metrics-server.yml"
+    owner: "{{ app.user }}"
+    group: "{{ app.group }}"
+    mode: 0755
+
 - name: kubectl dashboard yml
   shell: |
     kubectl apply -f {{ app.home }}/dashboard/dashboard.yml
+    kubectl apply -f {{ app.home }}/dashboard/metrics-server.yml
 
 - name: Create dashboard manager user
   shell: |
