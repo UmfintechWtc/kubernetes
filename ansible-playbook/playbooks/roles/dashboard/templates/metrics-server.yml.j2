@@ -83,7 +83,7 @@ spec:
         emptyDir: {}
       containers:
       - name: metrics-server
-        image: {{ DockerRegistry }}/base/{{ server_repository.split("/")[1] }}
+        image: {{ DockerRegistry }}/base/{{ metrics_server_repository.split("/")[1] }}
         imagePullPolicy: IfNotPresent
         args:
           - --cert-dir=/tmp
