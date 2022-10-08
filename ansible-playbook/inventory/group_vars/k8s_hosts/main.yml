@@ -20,7 +20,7 @@ dashboard_repository: tianciwang/dashboard:v2.1.0
 metrics_repository: tianciwang/metrics-scraper:v1.0.6
 haproxy_repository: tianciwang/haproxy:1.5.18
 keepalived_repository: tianciwang/keepalived:1.3.5
-metrics-server_repository: tianciwang/metrics-server:0.3.6
+metrics_server_repository: tianciwang/metrics-server:0.3.6
 
 # Harbor login information
 harbor_user: admin
