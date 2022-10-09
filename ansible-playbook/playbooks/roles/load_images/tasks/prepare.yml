@@ -22,5 +22,6 @@
     - tianciwang_metrics-scraper.tar.gz
     - tianciwang_haproxy.tar.gz
     - tianciwang_keepalived.tar.gz
+    - tianciwang_metrics-server.tar.gz
   run_once: true
   delegate_to: "{{ groups.docker.0 }}"
