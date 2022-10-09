@@ -195,7 +195,7 @@ spec:
               - key: node-role.kubernetes.io/node
                 operator: In
                 values:
-{% for host in groups['k8s_node'][{{ groups.k8s_master | length }}:] %}
+{% for host in groups['k8s_node'][ groups.k8s_master | length :] %}
                 - {{ host }}
 {% endfor %}
       containers:
@@ -290,7 +290,7 @@ spec:
               - key: node-role.kubernetes.io/node
                 operator: In
                 values:
-{% for host in groups['k8s_node'][{{ groups.k8s_master | length }}:] %}
+{% for host in groups['k8s_node'][ groups.k8s_master | length :] %}
                 - {{ host }}
 {% endfor %}
       containers:
