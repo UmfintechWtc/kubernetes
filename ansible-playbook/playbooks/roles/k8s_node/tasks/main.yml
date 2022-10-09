@@ -7,7 +7,6 @@
   tags: kubelet
 - import_tasks: kube-proxy.yml
   tags: kube-proxy
-  when: inventory_hostname in groups['k8s_node'][{{ groups.k8s_master | length }}:]
 - import_tasks: global_cmd.yml
   tags: global_cmd
   when: inventory_hostname in groups['k8s_node'][{{ groups.k8s_master | length }}:]
