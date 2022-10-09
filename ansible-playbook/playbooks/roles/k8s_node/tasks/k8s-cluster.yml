@@ -22,7 +22,7 @@
   shell: |
     kubectl label node {{ hostvars[host]['ansible_host'] }} node-role.kubernetes.io/node=node{{ ( groups['k8s_master'] | get_host_num( host_index, host )) }}
   with_items:
-    - "{{ groups['k8s_node'][3:] }}"
+    - "{{ groups['k8s_node'][{{ groups.k8s_master | length }}:] }}"
   loop_control:
     loop_var: host
     index_var: host_index
