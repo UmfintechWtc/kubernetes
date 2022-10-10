@@ -41,7 +41,7 @@ spec:
             successThreshold: {{ .Values.livenessProbe.successThreshold }}
             failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
             tcpSocket:
-              port: alertmanager
+              port: grafana
           {{- end }}
           {{- if .Values.readinessProbe.enabled }}
           readinessProbe:
@@ -51,7 +51,7 @@ spec:
             successThreshold: {{ .Values.readinessProbe.successThreshold }}
             failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
             tcpSocket:
-              port: alertmanager
+              port: grafana
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
