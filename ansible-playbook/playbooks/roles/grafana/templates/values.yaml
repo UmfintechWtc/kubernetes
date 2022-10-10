@@ -1,0 +1,52 @@
+replicaCount: {{ service.grafana.replication }}
+
+image:
+  repository: {{ DockerRegistry }}/base/{{ role_name }}
+  pullPolicy: {{ service.grafana.pullPolicy }}
+  tag: "{{ service.grafana.tag }}"
+
+service:
+{% if service.grafana.nodePort %}
+  type: NodePort
+{% else %}
+  type: ClusterIP
+{% endif %}
+  port: {{ service.grafana.port }}
+  basePath: {{ service.containerPath }}/{{ role_name }}
+  extraArgs:
+    config: {{ service.containerPath }}/{{ role_name }}/conf/grafana.ini
+
+livenessProbe:
+{% if service.grafana.checkHealthy %}
+  enabled: true
+{% else %}
+  enabled: false
+{% endif %}
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 120
+  successThreshold: 1
+
+readinessProbe:
+{% if service.grafana.checkHealthy %}
+  enabled: true
+{% else %}
+  enabled: false
+{% endif %}
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 120
+  successThreshold: 1
+
+resources:
+   limits:
+     cpu: {{ service.grafana.limits.cpu }}
+     memory: {{ service.grafana.limits.memory }}
+   requests:
+     cpu: {{ service.grafana.requests.cpu }}
+     memory: {{ service.grafana.requests.memory }}
+
+serviceAccount:
+  create: true

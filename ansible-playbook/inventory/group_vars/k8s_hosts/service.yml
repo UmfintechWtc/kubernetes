@@ -7,10 +7,10 @@ service:
     port: 39090
     nodePort: True
     requests:
-      cpu: "100m"
+      cpu: "1024m"
       memory: "1024Mi"
     limits:
-      cpu: "100m"
+      cpu: "1024m"
       memory: "1024Mi"
     checkHealthy: true
     dbRetention: 15d
@@ -21,11 +21,24 @@ service:
     port: 39093
     nodePort: False
     requests:
-      cpu: "100m"
+      cpu: "1024m"
       memory: "1024Mi"
     limits:
-      cpu: "100m"
+      cpu: "1024m"
       memory: "1024Mi"
     checkHealthy: true
     dataRetention: 168h
     sendResolved: true
+  grafana:
+    replication: 1
+    pullPolicy: Always
+    tag: 9.1.7
+    port: 30000
+    nodePort: True
+    requests:
+      cpu: "1024m"
+      memory: "1024Mi"
+    limits:
+      cpu: "1024m"
+      memory: "1024Mi"
+    checkHealthy: true
