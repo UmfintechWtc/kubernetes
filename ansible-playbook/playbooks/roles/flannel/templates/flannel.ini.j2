@@ -1,0 +1,24 @@
+[program:{{ role_name }}]
+process_name = %(program_name)s
+command={{ flannel_bin_path }}/flanneld
+  --iface={{ ansible_default_ipv4.interface }}
+  --ip-masq
+  --etcd-endpoints={% for host in groups['etcd'] %}https://{{ hostvars[host]['ansible_host'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}
+  --etcd-prefix={{ k8s_network_path }}
+  --etcd-keyfile={{ flannel_ssl_path }}/flannel-key.pem
+  --etcd-certfile={{ flannel_ssl_path }}/flannel.pem
+  --etcd-cafile={{ flannel_ssl_path }}/ca.pem
+directory={{ flannel_path }}
+user= {{ app.user }}
+startsecs=3
+autostart = true
+autorestart = true
+stopwaitsecs = 360
+stopsignal = KILL
+stopasgroup = true
+stdout_logfile = {{ flannel_log_path }}/%(program_name)s_stdout.log
+stdout_logfile_maxbytes=100MB
+stdout_logfile_backups=5
+stderr_logfile = {{ flannel_log_path }}/%(program_name)s_stderr.log
+stderr_logfile_maxbytes=100MB
+stderr_logfile_backups=5

@@ -10,6 +10,7 @@
     - "{{ flannel_path }}"
     - "{{ flannel_bin_path }}"
     - "{{ flannel_ssl_path }}"
+    - "{{ flannel_log_path }}"
 
 - name: Copy ca file to ssl path
   copy:
@@ -57,10 +58,7 @@
     group: "{{ app.group }}"
     mode: 0755
   with_items:
-    - { src: flanneld.service.j2, dest: /usr/lib/systemd/system/flanneld.service }
-
-- name: systemctl daemon-reload
-  shell: |
-    systemctl daemon-reload
+    - { src: flannel.ini.j2, dest: /usr/lib/systemd/system/flannel.ini }
   notify:
-    - Restart flannel service
+    - add {{ role_name }}
+    - restart {{ role_name }}

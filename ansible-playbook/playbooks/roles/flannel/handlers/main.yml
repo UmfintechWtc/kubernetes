@@ -1,7 +1,10 @@
 ---
-- name: Restart flannel service
-  systemd:
-    name: flanneld
-    enabled: true
+- name: add {{ role_name }}
+  supervisorctl:
+    name: "{{ role_name }}"
+    state: present
+
+- name: restart {{ role_name }}
+  supervisorctl:
+    name: "{{ role_name }}"
     state: restarted
-    daemon_reload: yes
