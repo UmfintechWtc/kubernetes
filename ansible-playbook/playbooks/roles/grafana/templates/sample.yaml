@@ -6,5 +6,5 @@ providers:
   folderUid: ''
   type: file
   options:
-    path: {{ .Values.service.basePath }}/conf/provisioning/dashboards/
+    path: {{ service.containerPath }}/{{ role_name }}/conf/provisioning/dashboards/
   allowUiUpdates: true
