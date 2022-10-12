@@ -63,6 +63,9 @@ spec:
             - name: config
               mountPath: {{ .Values.service.basePath }}/conf/grafana.ini
               subPath: grafana.ini
+            - name: datasource
+              mountPath: {{ .Values.service.basePath }}/conf/provisioning/datasources/
+              subPath: prometheus.yaml
       volumes:
         - name: datadir
           hostPath:
@@ -75,3 +78,12 @@ spec:
         - name: config
           configMap:
             name: {{ include "grafana.name" . }}
+            item:
+              - key: grafana.ini
+                path: grafana.ini
+        - name: datasource
+          configMap:
+            name: {{ include "grafana.name" . }}
+            item:
+              - key: dashboard.yaml
+                path: prometheus.yaml

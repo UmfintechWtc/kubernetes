@@ -14,6 +14,7 @@ service:
       memory: "1024Mi"
     checkHealthy: true
     dbRetention: 15d
+    svcName: prometheus
   alertmanager:
     replication: 1
     pullPolicy: Always

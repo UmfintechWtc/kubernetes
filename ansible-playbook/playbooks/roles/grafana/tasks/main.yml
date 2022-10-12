@@ -10,6 +10,9 @@
       template:
         src: grafana.ini
         dest: "{{ role_path }}/files/deploy/charts/config"
+      with_items:
+        - grafana.ini
+        - dashboard.yaml
 
     - name: delete {{ role_name }} release if exists
       kubernetes.core.helm:

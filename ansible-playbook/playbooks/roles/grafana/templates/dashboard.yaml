@@ -1,0 +1,6 @@
+apiVersion: 1
+datasources:
+ - name: Prometheus
+   url: http://{{ service.prometheus.svcName }}:{{ service.prometheus.port }}
+   isDefault: 1
+   editable: true
