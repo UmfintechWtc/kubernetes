@@ -13,6 +13,7 @@
       with_items:
         - grafana.ini
         - dashboard.yaml
+        - sample.yaml
 
     - name: delete {{ role_name }} release if exists
       kubernetes.core.helm:
