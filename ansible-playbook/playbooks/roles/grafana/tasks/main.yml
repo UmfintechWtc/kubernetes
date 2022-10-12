@@ -8,7 +8,7 @@
 
     - name: template {{ role_name }} grafana.ini
       template:
-        src: grafana.ini
+        src: "{{ item }}"
         dest: "{{ role_path }}/files/deploy/charts/config"
       with_items:
         - grafana.ini
