@@ -64,7 +64,7 @@ spec:
               mountPath: {{ .Values.service.basePath }}/conf/grafana.ini
               subPath: grafana.ini
             - name: datasource
-              mountPath: {{ .Values.service.basePath }}/conf/provisioning/datasources/
+              mountPath: {{ .Values.service.basePath }}/conf/provisioning/datasources/prometheus.yaml
               subPath: prometheus.yaml
       volumes:
         - name: datadir
