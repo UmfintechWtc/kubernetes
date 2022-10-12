@@ -63,10 +63,10 @@ spec:
             - name: config
               mountPath: {{ .Values.service.basePath }}/conf/grafana.ini
               subPath: grafana.ini
-            - name: datasource
+            - name: prometheus-datasource
               mountPath: {{ .Values.service.basePath }}/conf/provisioning/datasources/prometheus.yaml
               subPath: prometheus.yaml
-            - name: nodeExporterDashboard
+            - name: node-exporter-dashboard
               mountPath: {{ .Values.service.basePath }}/conf/provisioning/dashboards/node-exporter.json
               subPath: node-exporter.json
       volumes:
@@ -84,13 +84,13 @@ spec:
             items:
               - key: grafana.ini
                 path: grafana.ini
-        - name: datasource
+        - name: prometheus-datasource
           configMap:
             name: {{ include "grafana.name" . }}
             items:
               - key: dashboard.yaml
                 path: prometheus.yaml
-        - name: nodeExporterDashboard
+        - name: node-exporter-dashboard
           configMap:
             name: {{ include "grafana.name" . }}
             items:
