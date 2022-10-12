@@ -78,12 +78,12 @@ spec:
         - name: config
           configMap:
             name: {{ include "grafana.name" . }}
-            item:
+            items:
               - key: grafana.ini
                 path: grafana.ini
         - name: datasource
           configMap:
             name: {{ include "grafana.name" . }}
-            item:
+            items:
               - key: dashboard.yaml
                 path: prometheus.yaml
