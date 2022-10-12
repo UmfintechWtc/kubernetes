@@ -66,6 +66,9 @@ spec:
             - name: datasource
               mountPath: {{ .Values.service.basePath }}/conf/provisioning/datasources/prometheus.yaml
               subPath: prometheus.yaml
+            - name: nodeExporterDashboard
+              mountPath: {{ .Values.service.basePath }}/conf/provisioning/dashboards/node-exporter.json
+              subPath: node-exporter.json
       volumes:
         - name: datadir
           hostPath:
@@ -87,3 +90,9 @@ spec:
             items:
               - key: dashboard.yaml
                 path: prometheus.yaml
+        - name: nodeExporterDashboard
+          configMap:
+            name: {{ include "grafana.name" . }}
+            items:
+              - key: node.json
+                path: node-exporter.json
