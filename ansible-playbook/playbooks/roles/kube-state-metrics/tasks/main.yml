@@ -1,0 +1,34 @@
+---
+- name: Deploy latest version of  {{ role_name }}  chart inside starx namespace (and create it)
+  block:
+    - name: template {{ role_name }} values.yaml
+      template:
+        src: values.yaml
+        dest: "{{ role_path }}/files/deploy/charts"
+
+    - name: delete {{ role_name }} release if exists
+      kubernetes.core.helm:
+        name: "{{ role_name }}"
+        release_namespace: "{{ namespace }}"
+        release_state: absent
+
+    - name: install helm chart of {{ role_name }}
+      kubernetes.core.helm:
+        name: "{{ role_name }}"
+        chart_ref: "{{ role_path }}/files/deploy/charts"
+        release_namespace: "{{ namespace }}"
+        create_namespace: true
+        wait: true
+        wait_timeout: 60s
+        force: true
+  vars:
+    ansible_python_interpreter: "{{ python_interpreter }}"
+
+  rescue:
+    - name: Execptions handling of {{ role_name }}
+      assert:
+        that:
+          - 200 <= 100
+        msg: u'[E-3000] helm启动{{ role_name }}服务失败!'
+
+

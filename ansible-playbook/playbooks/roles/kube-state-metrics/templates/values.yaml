@@ -1,0 +1,19 @@
+replicaCount: {{ service.kubeStateMetrics.replication }}
+
+image:
+  repository: {{ DockerRegistry }}/base/{{ role_name }}
+  pullPolicy: {{ service.grafana.pullPolicy }}
+  tag: "{{ service.grafana.tag }}"
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 80
+
+
+
+resources: {}

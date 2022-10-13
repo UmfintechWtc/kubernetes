@@ -43,3 +43,10 @@ service:
       cpu: "1024m"
       memory: "1024Mi"
     checkHealthy: true
+  kubeStateMetrics:
+    replication: 1
+    pullPolicy: Always
+    tag: 2.6.0
+    nodePort: False
+    clientPort: 8080
+    telemetryPort: 8081
