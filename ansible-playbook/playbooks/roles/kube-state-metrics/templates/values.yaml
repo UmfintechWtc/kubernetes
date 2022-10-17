@@ -2,8 +2,8 @@ replicaCount: {{ service.kubeStateMetrics.replication }}
 
 image:
   repository: {{ DockerRegistry }}/base/{{ role_name }}
-  pullPolicy: {{ service.grafana.pullPolicy }}
-  tag: "{{ service.grafana.tag }}"
+  pullPolicy: {{ service.kubeStateMetrics.pullPolicy }}
+  tag: "{{ service.kubeStateMetrics.tag }}"
 
 service:
 {% if service.kubeStateMetrics.nodePort %}

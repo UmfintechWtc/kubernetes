@@ -34,7 +34,7 @@ spec:
             {{- end }}
             {{- end }}
           ports:
-            - name: {{ include "kube-state-metrics.name" . }}
+            - name: metric-port
               containerPort: {{ .Values.service.extraArgs.port }}
               protocol: TCP
           {{- if .Values.livenessProbe.enabled }}
@@ -46,7 +46,7 @@ spec:
             failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
             httpGet:
               path: /healthz
-              port: {{ include "kube-state-metrics.name" . }}
+              port: metric-port
           {{- end }}
           {{- if .Values.readinessProbe.enabled }}
           readinessProbe:
@@ -57,7 +57,7 @@ spec:
             failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
             httpGet:
               path: /healthz
-              port: {{ include "kube-state-metrics.name" . }}
+              port: metric-port
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
