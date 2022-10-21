@@ -69,6 +69,9 @@ spec:
             - name: node-exporter-dashboard
               mountPath: {{ .Values.service.basePath }}/conf/provisioning/dashboards/node-exporter.json
               subPath: node-exporter.json
+            - name: pod-dashboard
+              mountPath: {{ .Values.service.basePath }}/conf/provisioning/dashboards/pod.json
+              subPath: pod.json
             - name: main-dashboard
               mountPath: {{ .Values.service.basePath }}/conf/provisioning/dashboards/sample.yaml
               subPath: sample.yaml
@@ -99,6 +102,12 @@ spec:
             items:
               - key: node.json
                 path: node-exporter.json
+        - name: pod-dashboard
+          configMap:
+            name: {{ include "grafana.name" . }}
+            items:
+              - key: pod.json
+                path: pod.json
         - name: main-dashboard
           configMap:
             name: {{ include "grafana.name" . }}
