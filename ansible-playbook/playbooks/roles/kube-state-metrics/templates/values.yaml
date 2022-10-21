@@ -2,18 +2,52 @@ replicaCount: {{ service.kubeStateMetrics.replication }}
 
 image:
   repository: {{ DockerRegistry }}/base/{{ role_name }}
-  pullPolicy: {{ service.grafana.pullPolicy }}
-  tag: "{{ service.grafana.tag }}"
+  pullPolicy: {{ service.kubeStateMetrics.pullPolicy }}
+  tag: "{{ service.kubeStateMetrics.tag }}"
+
+service:
+{% if service.kubeStateMetrics.nodePort %}
+  type: NodePort
+{% else %}
+  type: ClusterIP
+{% endif %}
+  extraArgs:
+    port: {{ service.kubeStateMetrics.clientPort }}
+    telemetry-port: {{ service.kubeStateMetrics.telemetryPort }}
+
+livenessProbe:
+{% if service.kubeStateMetrics.checkHealthy %}
+  enabled: true
+{% else %}
+  enabled: false
+{% endif %}
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 120
+  successThreshold: 1
+
+readinessProbe:
+{% if service.kubeStateMetrics.checkHealthy %}
+  enabled: true
+{% else %}
+  enabled: false
+{% endif %}
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 120
+  successThreshold: 1
+
+resources:
+   limits:
+     cpu: {{ service.kubeStateMetrics.limits.cpu }}
+     memory: {{ service.kubeStateMetrics.limits.memory }}
+   requests:
+     cpu: {{ service.kubeStateMetrics.requests.cpu }}
+     memory: {{ service.kubeStateMetrics.requests.memory }}
 
 serviceAccount:
   create: true
   annotations: {}
   name: ""
-
-service:
-  type: ClusterIP
-  port: 80
-
-
-
-resources: {}

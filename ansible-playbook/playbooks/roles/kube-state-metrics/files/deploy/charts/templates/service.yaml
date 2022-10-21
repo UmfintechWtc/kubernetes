@@ -5,11 +5,19 @@ metadata:
   labels:
     {{- include "kube-state-metrics.labels" . | nindent 4 }}
 spec:
+  {{- if eq .Values.service.type "ClusterIP" }}
   type: {{ .Values.service.type }}
+  clusterIP: None
+  {{- else }}
+  type: {{ .Values.service.type }}
+  {{- end }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
+    - name: {{ include "kube-state-metrics.name" . }}
+      port: {{ .Values.service.extraArgs.port }}
+      targetPort: {{ .Values.service.extraArgs.port }}
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.extraArgs.port }}
+      {{- end }}
       protocol: TCP
-      name: http
   selector:
     {{- include "kube-state-metrics.selectorLabels" . | nindent 4 }}

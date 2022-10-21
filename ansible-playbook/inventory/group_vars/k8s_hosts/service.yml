@@ -50,3 +50,10 @@ service:
     nodePort: False
     clientPort: 8080
     telemetryPort: 8081
+    requests:
+      cpu: "1024m"
+      memory: "1024Mi"
+    limits:
+      cpu: "1024m"
+      memory: "1024Mi"
+    checkHealthy: true
